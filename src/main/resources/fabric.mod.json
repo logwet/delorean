@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "delorean",
+  "version": "${version}",
+  "accessWidener": "delorean.accesswidener",
+  "name": "DeLorean",
+  "description": "Save slots mod for Minecraft 1.16.",
+  "authors": [
+    "logwet"
+  ],
+  "contact": {
+    "homepage": "https://github.com/logwet",
+    "sources": "https://github.com/logwet/delorean"
+  },
+  "license": "GPL-3.0",
+  "icon": "assets/delorean/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.logwet.delorean.DeLorean"
+    ],
+    "client": [
+      "me.logwet.delorean.DeLoreanClient"
+    ],
+    "server": [
+      "me.logwet.delorean.DeLoreanServer"
+    ]
+  },
+  "mixins": [
+    "delorean.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "minecraft": "1.16.x"
+  }
+}
