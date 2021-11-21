@@ -4,7 +4,9 @@
   "package": "me.logwet.delorean.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "DebugScreenOverlayMixin"
+    "DebugScreenOverlayMixin",
+    "saving.MinecraftServerAccessor",
+    "saving.MinecraftServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
