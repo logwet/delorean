@@ -4,11 +4,7 @@
   "package": "me.logwet.delorean.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-  ],
-  "client": [
-    "client.DebugScreenOverlayMixin"
-  ],
-  "server": [
+    "DebugScreenOverlayMixin"
   ],
   "injectors": {
     "defaultRequire": 1

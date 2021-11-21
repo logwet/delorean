@@ -1,4 +1,4 @@
-package me.logwet.delorean.mixin.client;
+package me.logwet.delorean.mixin;
 
 import java.util.List;
 import me.logwet.delorean.DeLorean;

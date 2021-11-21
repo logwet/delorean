@@ -14,16 +14,13 @@
   },
   "license": "GPL-3.0",
   "icon": "assets/delorean/icon.png",
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "main": [
       "me.logwet.delorean.DeLorean"
     ],
     "client": [
       "me.logwet.delorean.DeLoreanClient"
-    ],
-    "server": [
-      "me.logwet.delorean.DeLoreanServer"
     ]
   },
   "mixins": [
