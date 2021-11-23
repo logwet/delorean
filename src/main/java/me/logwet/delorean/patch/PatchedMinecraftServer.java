@@ -16,25 +16,40 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import me.logwet.delorean.DeLorean;
+import me.logwet.delorean.mixin.saving.ChunkMapAccessor;
+import me.logwet.delorean.mixin.saving.ChunkMapInvoker;
 import me.logwet.delorean.mixin.saving.DimensionDataStorageAccessor;
 import me.logwet.delorean.mixin.saving.MinecraftServerAccessor;
 import me.logwet.delorean.mixin.saving.PlayerAdvancementsAccessor;
 import me.logwet.delorean.mixin.saving.PlayerListAccessor;
+import me.logwet.delorean.mixin.saving.ServerChunkCacheInvoker;
 import me.logwet.delorean.mixin.saving.ServerStatsCounterInvoker;
 import net.minecraft.SharedConstants;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerAdvancements;
+import net.minecraft.server.level.ChunkHolder;
+import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.stats.ServerStatsCounter;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.util.datafix.DataFixers;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.ImposterProtoChunk;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.storage.ChunkSerializer;
+import net.minecraft.world.level.chunk.storage.IOWorker;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
@@ -247,6 +262,7 @@ public abstract class PatchedMinecraftServer {
 
     public void saveLevel(
             ServerLevel serverLevel, ProgressListener progressListener, boolean bl, boolean bl2) {
+        // Value of bl is ignored
 
         if (!bl2) {
             if (progressListener != null) {
@@ -282,6 +298,110 @@ public abstract class PatchedMinecraftServer {
 
             if (progressListener != null) {
                 progressListener.progressStage(new TranslatableComponent("menu.savingChunks"));
+            }
+
+            {
+                ServerChunkCache serverChunkCache = serverLevel.getChunkSource();
+                ((ServerChunkCacheInvoker) serverChunkCache).invokeRunDistanceManagerUpdate();
+                ChunkMap chunkMap = serverChunkCache.chunkMap;
+
+                {
+                    ChunkMapAccessor chunkMapAccessor = (ChunkMapAccessor) chunkMap;
+
+                    boolean forceWrites = minecraftServer.forceSynchronousWrites();
+
+                    File file =
+                            new File(
+                                    patchedStorageSource.getDimensionPath(serverLevel.dimension()),
+                                    "region");
+                    IOWorker worker = new PatchedIOWorker(file, forceWrites, "chunk");
+
+                    chunkMapAccessor.getVisibleChunkMap().values().stream()
+                            .filter(ChunkHolder::wasAccessibleSinceLastSave)
+                            .forEach(
+                                    (chunkHolder) -> {
+                                        ChunkAccess chunkAccess =
+                                                chunkHolder.getChunkToSave().getNow(null);
+                                        if (chunkAccess instanceof ImposterProtoChunk
+                                                || chunkAccess instanceof LevelChunk) {
+                                            save:
+                                            {
+                                                chunkMapAccessor
+                                                        .getPoiManager()
+                                                        .flush(chunkAccess.getPos());
+                                                if (!chunkAccess.isUnsaved()) {
+                                                    break save;
+                                                } else {
+                                                    chunkAccess.setLastSaveTime(
+                                                            serverLevel.getGameTime());
+                                                    chunkAccess.setUnsaved(false);
+                                                    ChunkPos chunkPos = chunkAccess.getPos();
+
+                                                    try {
+                                                        ChunkStatus chunkStatus =
+                                                                chunkAccess.getStatus();
+                                                        if (chunkStatus.getChunkType()
+                                                                != ChunkStatus.ChunkType
+                                                                        .LEVELCHUNK) {
+                                                            if (((ChunkMapInvoker) chunkMap)
+                                                                    .invokeIsExistingChunkFull(
+                                                                            chunkPos)) {
+                                                                break save;
+                                                            }
+
+                                                            if (chunkStatus == ChunkStatus.EMPTY
+                                                                    && chunkAccess
+                                                                            .getAllStarts()
+                                                                            .values()
+                                                                            .stream()
+                                                                            .noneMatch(
+                                                                                    StructureStart
+                                                                                            ::isValid)) {
+                                                                break save;
+                                                            }
+                                                        }
+
+                                                        serverLevel
+                                                                .getProfiler()
+                                                                .incrementCounter("chunkSave");
+                                                        CompoundTag compoundTag =
+                                                                ChunkSerializer.write(
+                                                                        serverLevel, chunkAccess);
+
+                                                        {
+                                                            worker.store(chunkPos, compoundTag);
+                                                        }
+
+                                                        {
+                                                            chunkMapAccessor
+                                                                    .getChunkTypeCache()
+                                                                    .put(
+                                                                            chunkPos.toLong(),
+                                                                            (byte)
+                                                                                    (chunkStatus
+                                                                                                            .getChunkType()
+                                                                                                    == ChunkStatus
+                                                                                                            .ChunkType
+                                                                                                            .PROTOCHUNK
+                                                                                            ? -1
+                                                                                            : 1));
+                                                        }
+
+                                                        break save;
+                                                    } catch (Exception var5) {
+                                                        DeLorean.LOGGER.error(
+                                                                "Failed to save chunk {},{}",
+                                                                chunkPos.x,
+                                                                chunkPos.z,
+                                                                var5);
+                                                        break save;
+                                                    }
+                                                }
+                                            }
+                                            chunkHolder.refreshAccessibility();
+                                        }
+                                    });
+                }
             }
         }
     }

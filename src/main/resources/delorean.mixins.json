@@ -5,11 +5,14 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "DebugScreenOverlayMixin",
+    "saving.ChunkMapAccessor",
+    "saving.ChunkMapInvoker",
     "saving.DimensionDataStorageAccessor",
     "saving.MinecraftServerAccessor",
     "saving.MinecraftServerMixin",
     "saving.PlayerAdvancementsAccessor",
     "saving.PlayerListAccessor",
+    "saving.ServerChunkCacheInvoker",
     "saving.ServerStatsCounterInvoker"
   ],
   "injectors": {
