@@ -6,7 +6,8 @@
   "mixins": [
     "DebugScreenOverlayMixin",
     "saving.MinecraftServerAccessor",
-    "saving.MinecraftServerMixin"
+    "saving.MinecraftServerMixin",
+    "saving.PlayerListAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

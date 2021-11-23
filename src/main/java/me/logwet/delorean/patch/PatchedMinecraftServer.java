@@ -5,9 +5,14 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import me.logwet.delorean.DeLorean;
 import me.logwet.delorean.mixin.saving.MinecraftServerAccessor;
+import me.logwet.delorean.mixin.saving.PlayerListAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.stats.ServerStatsCounter;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -25,8 +30,12 @@ public abstract class PatchedMinecraftServer {
     PlayerDataStorage patchedPlayerDataStorage;
     StructureManager patchedStructureManager;
 
+    PlayerList playerList;
+
     public PatchedMinecraftServer(MinecraftServer minecraftServer) {
         this.minecraftServer = minecraftServer;
+
+        playerList = minecraftServer.getPlayerList();
     }
 
     public void setSaveSlot(int index) {
@@ -72,6 +81,10 @@ public abstract class PatchedMinecraftServer {
 
         MinecraftServerAccessor minecraftServerAccessor = (MinecraftServerAccessor) minecraftServer;
 
+        if (playerList != null) {
+            saveAllPlayers();
+        }
+
         boolean levelsSaved = false;
 
         for (Iterator<ServerLevel> var5 = minecraftServer.getAllLevels().iterator();
@@ -97,11 +110,32 @@ public abstract class PatchedMinecraftServer {
                 .setCustomBossEvents(minecraftServer.getCustomBossEvents().save());
 
         DeLorean.log(Level.INFO, String.format("Saving data for slot %d", slot));
+
         patchedStorageSource.saveDataTag(
                 minecraftServerAccessor.getRegistryHolder(),
                 minecraftServerAccessor.getWorldData(),
                 minecraftServer.getPlayerList().getSingleplayerData());
 
         return levelsSaved;
+    }
+
+    public void saveAllPlayers() {
+        PlayerListAccessor playerListAccessor = (PlayerListAccessor) playerList;
+
+        for (ServerPlayer serverPlayer : playerList.getPlayers()) {
+            patchedPlayerDataStorage.save(serverPlayer);
+
+            ServerStatsCounter serverStatsCounter =
+                    playerListAccessor.getStats().get(serverPlayer.getUUID());
+            if (serverStatsCounter != null) {
+                serverStatsCounter.save();
+            }
+
+            PlayerAdvancements playerAdvancements =
+                    playerListAccessor.getAdvancements().get(serverPlayer.getUUID());
+            if (playerAdvancements != null) {
+                playerAdvancements.save();
+            }
+        }
     }
 }
