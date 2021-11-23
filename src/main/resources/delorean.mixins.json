@@ -5,9 +5,12 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "DebugScreenOverlayMixin",
+    "saving.DimensionDataStorageAccessor",
     "saving.MinecraftServerAccessor",
     "saving.MinecraftServerMixin",
-    "saving.PlayerListAccessor"
+    "saving.PlayerAdvancementsAccessor",
+    "saving.PlayerListAccessor",
+    "saving.ServerStatsCounterInvoker"
   ],
   "injectors": {
     "defaultRequire": 1

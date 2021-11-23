@@ -1,24 +1,49 @@
 package me.logwet.delorean.patch;
 
+import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import me.logwet.delorean.DeLorean;
+import me.logwet.delorean.mixin.saving.DimensionDataStorageAccessor;
 import me.logwet.delorean.mixin.saving.MinecraftServerAccessor;
+import me.logwet.delorean.mixin.saving.PlayerAdvancementsAccessor;
 import me.logwet.delorean.mixin.saving.PlayerListAccessor;
+import me.logwet.delorean.mixin.saving.ServerStatsCounterInvoker;
+import net.minecraft.SharedConstants;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.stats.ServerStatsCounter;
+import net.minecraft.util.ProgressListener;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import net.minecraft.world.level.storage.ServerLevelData;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Level;
 
 public abstract class PatchedMinecraftServer {
@@ -99,13 +124,13 @@ public abstract class PatchedMinecraftServer {
                                 slot, serverLevel, serverLevel.dimension().location()));
             }
 
-            serverLevel.save(null, bl2, serverLevel.noSave && !bl3);
+            saveLevel(serverLevel, null, bl2, serverLevel.noSave && !bl3);
         }
 
         ServerLevel serverLevel2 = minecraftServer.overworld();
-        ServerLevelData serverLevelData = minecraftServerAccessor.getWorldData().overworldData();
+        ServerLevelData serverLevelData = minecraftServer.getWorldData().overworldData();
         serverLevelData.setWorldBorder(serverLevel2.getWorldBorder().createSettings());
-        minecraftServerAccessor
+        minecraftServer
                 .getWorldData()
                 .setCustomBossEvents(minecraftServer.getCustomBossEvents().save());
 
@@ -113,7 +138,7 @@ public abstract class PatchedMinecraftServer {
 
         patchedStorageSource.saveDataTag(
                 minecraftServerAccessor.getRegistryHolder(),
-                minecraftServerAccessor.getWorldData(),
+                minecraftServer.getWorldData(),
                 minecraftServer.getPlayerList().getSingleplayerData());
 
         return levelsSaved;
@@ -128,14 +153,140 @@ public abstract class PatchedMinecraftServer {
             ServerStatsCounter serverStatsCounter =
                     playerListAccessor.getStats().get(serverPlayer.getUUID());
             if (serverStatsCounter != null) {
-                serverStatsCounter.save();
+                File file =
+                        new File(
+                                getWorldPath(LevelResource.PLAYER_STATS_DIR).toFile(),
+                                serverPlayer.getUUID() + ".json");
+
+                try {
+                    FileUtils.writeStringToFile(
+                            file, ((ServerStatsCounterInvoker) serverStatsCounter).invokeToJson());
+                } catch (IOException e) {
+                    DeLorean.LOGGER.error("Couldn't save stats", e);
+                }
             }
 
             PlayerAdvancements playerAdvancements =
                     playerListAccessor.getAdvancements().get(serverPlayer.getUUID());
             if (playerAdvancements != null) {
-                playerAdvancements.save();
+                File file =
+                        new File(
+                                getWorldPath(LevelResource.PLAYER_ADVANCEMENTS_DIR).toFile(),
+                                serverPlayer.getUUID() + ".json");
+                Gson GSON = PlayerAdvancementsAccessor.getGson();
+
+                Map<ResourceLocation, AdvancementProgress> map = Maps.newHashMap();
+
+                for (Entry<Advancement, AdvancementProgress> advancementAdvancementProgressEntry :
+                        ((PlayerAdvancementsAccessor) playerAdvancements)
+                                .getAdvancements()
+                                .entrySet()) {
+                    AdvancementProgress advancementProgress =
+                            advancementAdvancementProgressEntry.getValue();
+                    if (advancementProgress.hasProgress()) {
+                        map.put(
+                                advancementAdvancementProgressEntry.getKey().getId(),
+                                advancementProgress);
+                    }
+                }
+
+                if (file.getParentFile() != null) {
+                    file.getParentFile().mkdirs();
+                }
+
+                JsonElement jsonElement = GSON.toJsonTree(map);
+                jsonElement
+                        .getAsJsonObject()
+                        .addProperty(
+                                "DataVersion",
+                                SharedConstants.getCurrentVersion().getWorldVersion());
+
+                try {
+                    OutputStream outputStream = new FileOutputStream(file);
+                    Throwable var38 = null;
+
+                    try {
+                        Writer writer =
+                                new OutputStreamWriter(outputStream, Charsets.UTF_8.newEncoder());
+                        Throwable var6 = null;
+
+                        try {
+                            GSON.toJson(jsonElement, writer);
+                        } finally {
+                            if (writer != null) {
+                                if (var6 != null) {
+                                    try {
+                                        writer.close();
+                                    } catch (Throwable var30) {
+                                        var6.addSuppressed(var30);
+                                    }
+                                } else {
+                                    writer.close();
+                                }
+                            }
+                        }
+                    } finally {
+                        if (outputStream != null) {
+                            if (var38 != null) {
+                                try {
+                                    outputStream.close();
+                                } catch (Throwable var29) {
+                                    var38.addSuppressed(var29);
+                                }
+                            } else {
+                                outputStream.close();
+                            }
+                        }
+                    }
+                } catch (IOException var35) {
+                    DeLorean.LOGGER.error("Couldn't save player advancements to {}", file, var35);
+                }
             }
         }
+    }
+
+    public void saveLevel(
+            ServerLevel serverLevel, ProgressListener progressListener, boolean bl, boolean bl2) {
+
+        if (!bl2) {
+            if (progressListener != null) {
+                progressListener.progressStartNoAbort(
+                        new TranslatableComponent("menu.savingLevel"));
+            }
+
+            {
+                if (serverLevel.dragonFight() != null) {
+                    minecraftServer
+                            .getWorldData()
+                            .setEndDragonFightData(
+                                    Objects.requireNonNull(serverLevel.dragonFight()).saveData());
+                }
+
+                DimensionDataStorage dimensionDataStorage =
+                        serverLevel.getChunkSource().getDataStorage();
+                DimensionDataStorageAccessor dimensionDataStorageAccessor =
+                        (DimensionDataStorageAccessor) dimensionDataStorage;
+
+                File file =
+                        new File(
+                                patchedStorageSource.getDimensionPath(serverLevel.dimension()),
+                                "data");
+                file.mkdirs();
+
+                for (SavedData savedData : dimensionDataStorageAccessor.getCache().values()) {
+                    if (savedData != null) {
+                        savedData.save(new File(file, savedData.getId() + ".dat"));
+                    }
+                }
+            }
+
+            if (progressListener != null) {
+                progressListener.progressStage(new TranslatableComponent("menu.savingChunks"));
+            }
+        }
+    }
+
+    public Path getWorldPath(LevelResource levelResource) {
+        return patchedStorageSource.getLevelPath(levelResource);
     }
 }

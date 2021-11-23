@@ -4,7 +4,6 @@ import net.minecraft.core.RegistryAccess.RegistryHolder;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerResources;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
-import net.minecraft.world.level.storage.WorldData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -15,9 +14,6 @@ public interface MinecraftServerAccessor {
 
     @Accessor("resources")
     ServerResources getResources();
-
-    @Accessor("worldData")
-    WorldData getWorldData();
 
     @Accessor("registryHolder")
     RegistryHolder getRegistryHolder();
