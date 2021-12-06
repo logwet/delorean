@@ -62,41 +62,27 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Level;
 
 public abstract class PatchedMinecraftServer {
-    MinecraftServer minecraftServer;
-
-    int slot;
-
-    LevelStorageAccess patchedStorageSource;
-    PlayerDataStorage patchedPlayerDataStorage;
-    StructureManager patchedStructureManager;
-
+    private final MinecraftServer minecraftServer;
+    private final int slot;
+    public LevelStorageAccess patchedStorageSource;
     PlayerList playerList;
+    private PlayerDataStorage patchedPlayerDataStorage;
+    private StructureManager patchedStructureManager;
 
-    public PatchedMinecraftServer(MinecraftServer minecraftServer) {
+    public PatchedMinecraftServer(MinecraftServer minecraftServer, int index) {
         this.minecraftServer = minecraftServer;
 
         playerList = minecraftServer.getPlayerList();
-    }
 
-    public void setSaveSlot(int index) {
         MinecraftServerAccessor minecraftServerAccessor = (MinecraftServerAccessor) minecraftServer;
 
         slot = index;
 
-        Path gameDirectory = Minecraft.getInstance().gameDirectory.toPath();
-
-        String levelId = minecraftServerAccessor.getStorageSource().getLevelId();
-
-        LevelStorageSource levelStorageSource =
-                new LevelStorageSource(
-                        gameDirectory.resolve("saves/" + levelId + "/savestates"),
-                        gameDirectory.resolve("backups/" + levelId + "/backupstates"),
-                        DataFixers.getDataFixer());
-
         patchedStorageSource = null;
 
         try {
-            patchedStorageSource = levelStorageSource.createAccess("state_" + index);
+            patchedStorageSource =
+                    genPatchedLevelStorageAccess(minecraftServerAccessor.getStorageSource(), index);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -112,6 +98,21 @@ public abstract class PatchedMinecraftServer {
         } else {
             DeLorean.log(Level.ERROR, "Unable to create LevelStorageAccess for slot " + index);
         }
+    }
+
+    private static LevelStorageAccess genPatchedLevelStorageAccess(
+            LevelStorageAccess levelStorageAccess, int index) throws IOException {
+        String levelId = levelStorageAccess.getLevelId();
+
+        Path gameDirectory = Minecraft.getInstance().gameDirectory.toPath();
+
+        LevelStorageSource levelStorageSource =
+                new LevelStorageSource(
+                        gameDirectory.resolve("saves/" + levelId + "/savestates"),
+                        gameDirectory.resolve("backups/" + levelId + "/backupstates"),
+                        DataFixers.getDataFixer());
+
+        return levelStorageSource.createAccess("state_" + index);
     }
 
     public boolean saveSlot() {
@@ -159,7 +160,7 @@ public abstract class PatchedMinecraftServer {
         return levelsSaved;
     }
 
-    public void saveAllPlayers() {
+    private void saveAllPlayers() {
         PlayerListAccessor playerListAccessor = (PlayerListAccessor) playerList;
 
         for (ServerPlayer serverPlayer : playerList.getPlayers()) {
@@ -260,7 +261,7 @@ public abstract class PatchedMinecraftServer {
         }
     }
 
-    public void saveLevel(
+    private void saveLevel(
             ServerLevel serverLevel, ProgressListener progressListener, boolean bl, boolean bl2) {
         // Value of bl is ignored
 
@@ -404,6 +405,24 @@ public abstract class PatchedMinecraftServer {
                 }
             }
         }
+    }
+
+    public boolean loadSlot() {
+        SaveSlots.currentSlot.set(slot);
+        SaveSlots.isLoading.set(true);
+
+        minecraftServer.halt(true);
+
+        Minecraft.getInstance()
+                .loadLevel(
+                        ((MinecraftServerAccessor) minecraftServer)
+                                .getStorageSource()
+                                .getLevelId());
+
+        SaveSlots.isLoading.set(false);
+        SaveSlots.currentSlot.set(-1);
+
+        return true;
     }
 
     public Path getWorldPath(LevelResource levelResource) {

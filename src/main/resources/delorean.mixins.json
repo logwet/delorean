@@ -5,6 +5,8 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "DebugScreenOverlayMixin",
+    "loading.IntegratedServerMixin",
+    "loading.MinecraftMixin",
     "saving.ChunkMapAccessor",
     "saving.ChunkMapInvoker",
     "saving.DimensionDataStorageAccessor",
