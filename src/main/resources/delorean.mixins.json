@@ -4,18 +4,13 @@
   "package": "me.logwet.delorean.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "DebugScreenOverlayMixin",
-    "loading.IntegratedServerMixin",
-    "loading.MinecraftMixin",
-    "saving.ChunkMapAccessor",
-    "saving.ChunkMapInvoker",
-    "saving.DimensionDataStorageAccessor",
-    "saving.MinecraftServerAccessor",
-    "saving.MinecraftServerMixin",
-    "saving.PlayerAdvancementsAccessor",
-    "saving.PlayerListAccessor",
-    "saving.ServerChunkCacheInvoker",
-    "saving.ServerStatsCounterInvoker"
+  ],
+  "client": [
+    "client.DebugScreenOverlayMixin",
+    "client.IntegratedServerMixin"
+  ],
+  "server": [
+    "server.DedicatedServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
