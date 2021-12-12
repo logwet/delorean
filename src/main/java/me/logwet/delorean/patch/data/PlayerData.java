@@ -1,7 +1,7 @@
 package me.logwet.delorean.patch.data;
 
 public class PlayerData {
-    private String uuid;
+    private final String uuid;
     private double velX = 0.0D;
     private double velY = 0.0D;
     private double velZ = 0.0D;

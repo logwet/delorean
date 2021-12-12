@@ -4,10 +4,13 @@
   "package": "me.logwet.delorean.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "common.CommandsMixin",
+    "common.MinecraftServerPatchMixin"
   ],
   "client": [
     "client.DebugScreenOverlayMixin",
-    "client.IntegratedServerMixin"
+    "client.IntegratedServerMixin",
+    "client.MinecraftPatchMixin"
   ],
   "server": [
     "server.DedicatedServerMixin"

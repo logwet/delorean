@@ -25,6 +25,8 @@ public class DeLorean implements ModInitializer {
             FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     public static final Logger LOGGER = LogManager.getLogger(MODID);
 
+    public static String SAVESTATES_DIR_NAME = "savestates";
+
     @NotNull public static SlotManager SLOTMANAGER;
 
     public static void log(Level level, String message) {
@@ -36,7 +38,7 @@ public class DeLorean implements ModInitializer {
                 new SlotManager(
                         new File(
                                 minecraftServer.getWorldPath(LevelResource.ROOT).toFile(),
-                                "savestates"),
+                                SAVESTATES_DIR_NAME),
                         minecraftServer);
     }
 

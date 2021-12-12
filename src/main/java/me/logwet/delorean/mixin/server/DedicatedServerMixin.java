@@ -4,6 +4,8 @@ import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.datafixers.DataFixer;
 import me.logwet.delorean.DeLorean;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.RegistryAccess.RegistryHolder;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerResources;
@@ -20,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+@Environment(EnvType.SERVER)
 @Mixin(DedicatedServer.class)
 public abstract class DedicatedServerMixin {
     @Inject(method = "<init>", at = @At("TAIL"))

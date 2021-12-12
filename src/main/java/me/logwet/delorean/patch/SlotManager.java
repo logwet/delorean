@@ -1,11 +1,14 @@
 package me.logwet.delorean.patch;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import me.logwet.delorean.patch.data.DataFile;
+import me.logwet.delorean.patch.data.PlayerData;
 import me.logwet.delorean.patch.data.SlotsData;
 import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.NotNull;
@@ -15,16 +18,16 @@ public class SlotManager {
     private final Map<String, SlotWrapper> saveSlots = new HashMap<>();
     private final File saveslotsDir;
     private final MinecraftServer minecraftServer;
-
-    @NotNull private SlotsData slotsData;
-    private DataFile<SlotsData> slotsDataFile;
+    private final DataFile<SlotsData> slotsDataFile;
+    @NotNull public SlotsData slotsData;
+    protected List<PlayerData> playerDataList = new ArrayList<>();
 
     public SlotManager(File saveslotsDir, MinecraftServer minecraftServer) {
         this.saveslotsDir = saveslotsDir;
         this.saveslotsDir.mkdirs();
         this.minecraftServer = minecraftServer;
 
-        slotsDataFile = new DataFile<>(new File(saveslotsDir, "slots.json"));
+        slotsDataFile = new DataFile<>(new File(saveslotsDir, "slots.json"), SlotsData.class);
 
         slotsData = slotsDataFile.read();
 
@@ -38,7 +41,11 @@ public class SlotManager {
         return slotsDataFile.write(slotsData);
     }
 
-    private String getLatestId() {
+    public int getLatestSlot() {
+        return slotsData.getSlots().lastKey();
+    }
+
+    public String getLatestId() {
         return slotsData.getSlots().lastEntry().getValue();
     }
 
@@ -54,7 +61,7 @@ public class SlotManager {
         return saveSlots.remove(id);
     }
 
-    public String add(@Nullable String id) {
+    private String add(@Nullable String id) {
         if (Objects.isNull(id)) {
             id = UUID.randomUUID().toString();
         }
@@ -64,7 +71,7 @@ public class SlotManager {
         if (!slotsData.getSlots().containsValue(id)) {
             if (slotsData.getSlots().size() > 0) {
                 int last = slotsData.getSlots().lastKey();
-                for (i = 0; i <= last + 1; i++) {
+                for (i = 0; i <= last; i++) {
                     Integer ceil = slotsData.getSlots().ceilingKey(i);
                     if (Objects.nonNull(ceil)) {
                         if (ceil > i) {
@@ -86,18 +93,18 @@ public class SlotManager {
         saveSlotsData();
 
         if (Objects.nonNull(minecraftServer)) {
-            putSlotWrapper(id, new SlotWrapper(saveslotsDir, id, minecraftServer));
+            putSlotWrapper(id, new SlotWrapper(saveslotsDir, id));
             return id;
         }
 
         return null;
     }
 
-    public String add(Integer slot) {
+    private String add(Integer slot) {
         return add(new UUID(slot, 0L).toString());
     }
 
-    public String add() {
+    private String add() {
         return add((String) null);
     }
 
@@ -115,12 +122,17 @@ public class SlotManager {
     }
 
     public boolean save(String id) {
+        add(id);
         return getSlotWrapper(id).save(minecraftServer);
     }
 
     public boolean save(int slot) {
         String id = slotsData.getSlots().get(slot);
         return save(id);
+    }
+
+    public boolean save() {
+        return save(add());
     }
 
     public boolean load(String id) {
@@ -130,5 +142,9 @@ public class SlotManager {
     public boolean load(int slot) {
         String id = slotsData.getSlots().get(slot);
         return load(id);
+    }
+
+    public boolean load() {
+        return load(getLatestId());
     }
 }

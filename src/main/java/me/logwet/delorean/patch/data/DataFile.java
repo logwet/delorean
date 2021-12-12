@@ -2,13 +2,11 @@ package me.logwet.delorean.patch.data;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.util.Objects;
 import me.logwet.delorean.DeLorean;
@@ -18,17 +16,22 @@ public class DataFile<T> {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final File file;
-    private final Type type = new TypeToken<T>() {}.getType();
+    private final Class<T> clazz;
 
-    public DataFile(File file) {
+    public DataFile(File file, Class<T> clazz) {
         this.file = file;
+        this.clazz = clazz;
     }
 
     @Nullable
     public T read() {
         if (file.exists() && !file.isDirectory()) {
             try (Reader reader = Files.newBufferedReader(file.toPath())) {
-                return GSON.fromJson(reader, type);
+                try {
+                    return GSON.fromJson(reader, clazz);
+                } catch (ClassCastException e) {
+                    return null;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -39,17 +42,16 @@ public class DataFile<T> {
 
     public boolean write(@Nullable T obj) {
         if (Objects.isNull(obj)) {
+            //noinspection ResultOfMethodCallIgnored
             file.delete();
             return false;
         }
 
         try (Writer writer = new FileWriter(file)) {
-            System.out.println(GSON.toJson(obj, type));
-            GSON.toJson(obj, type, writer);
+            GSON.toJson(obj, clazz, writer);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
-            DeLorean.LOGGER.debug(e);
+            DeLorean.LOGGER.debug(e.getMessage());
         }
 
         return false;
