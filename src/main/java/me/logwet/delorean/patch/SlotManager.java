@@ -121,6 +121,18 @@ public class SlotManager {
         return delete(id);
     }
 
+    public boolean deleteAll() {
+        boolean r = true;
+
+        for (String id : slotsData.getSlots().values()) {
+            if (!delete(id)) {
+                r = false;
+            }
+        }
+
+        return r;
+    }
+
     public boolean save(String id) {
         add(id);
         return getSlotWrapper(id).save(minecraftServer);

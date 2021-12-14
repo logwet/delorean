@@ -4,7 +4,7 @@
   "package": "me.logwet.delorean.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "common.CommandsMixin",
+    "common.MinecraftServerAccessor",
     "common.MinecraftServerPatchMixin"
   ],
   "client": [

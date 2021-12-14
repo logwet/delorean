@@ -13,7 +13,7 @@ public class PlayerData {
         this.velZ = velZ;
     }
 
-    public String getUuid() {
+    public String getUUID() {
         return uuid;
     }
 

@@ -18,6 +18,9 @@
   "entrypoints": {
     "main": [
       "me.logwet.delorean.DeLorean"
+    ],
+    "client": [
+      "me.logwet.delorean.DeLoreanClient"
     ]
   },
   "mixins": [
