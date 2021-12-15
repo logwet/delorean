@@ -122,6 +122,7 @@ public class CommandManager {
         dispatcher.register(
                 literal("delorean")
                         .executes(CommandManager::list)
+                        .then(literal("list").executes(CommandManager::list))
                         .then(
                                 literal("save")
                                         .executes(CommandManager::saveLatest)

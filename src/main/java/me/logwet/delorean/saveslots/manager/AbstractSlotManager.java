@@ -146,7 +146,10 @@ public abstract class AbstractSlotManager implements SlotManager {
 
     @Override
     public boolean load() {
-        return load(getLatestId());
+        if (slotsData.getSlots().size() > 0) {
+            return load(getLatestId());
+        }
+        return false;
     }
 
     @Override
@@ -166,7 +169,10 @@ public abstract class AbstractSlotManager implements SlotManager {
 
     @Override
     public boolean delete() {
-        return delete(getLatestId());
+        if (slotsData.getSlots().size() > 0) {
+            return delete(getLatestId());
+        }
+        return false;
     }
 
     @Override
