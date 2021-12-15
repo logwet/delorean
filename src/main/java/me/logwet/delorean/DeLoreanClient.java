@@ -19,7 +19,7 @@ public class DeLoreanClient implements ClientModInitializer {
         KeyMapping savestateKey =
                 KeyBindingHelper.registerKeyBinding(
                         new KeyMapping(
-                                "key.delorean.savestate",
+                                "key.delorean.save",
                                 Type.KEYSYM,
                                 GLFW.GLFW_KEY_PAGE_UP,
                                 "key.category.delorean"));
@@ -27,7 +27,7 @@ public class DeLoreanClient implements ClientModInitializer {
         KeyMapping loadstateKey =
                 KeyBindingHelper.registerKeyBinding(
                         new KeyMapping(
-                                "key.delorean.loadstate",
+                                "key.delorean.load",
                                 Type.KEYSYM,
                                 GLFW.GLFW_KEY_PAGE_DOWN,
                                 "key.category.delorean"));
@@ -48,7 +48,7 @@ public class DeLoreanClient implements ClientModInitializer {
                         if (DeLorean.CONTROL_ENABLED) {
                             while (savestateKey.consumeClick()) {
                                 client.player.displayClientMessage(
-                                        new TextComponent("Saving latest state..."), true);
+                                        new TextComponent("Saving state..."), true);
 
                                 Thread thread =
                                         new Thread(
@@ -65,7 +65,7 @@ public class DeLoreanClient implements ClientModInitializer {
 
                             while (loadstateKey.consumeClick()) {
                                 client.player.displayClientMessage(
-                                        new TextComponent("Loading latest state..."), true);
+                                        new TextComponent("Loaded state"), true);
 
                                 DeLorean.TRIGGER_LOAD.set(true);
                             }

@@ -14,7 +14,6 @@ import me.logwet.delorean.patch.data.SlotData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -151,6 +150,13 @@ public class SlotWrapper {
     public boolean load(MinecraftServer minecraftServer) {
         DeLorean.log(Level.INFO, "Loading slot " + id);
 
+        if (DeLorean.IS_CLIENT) {
+            Minecraft.getInstance()
+                    .setScreen(
+                            new GenericDirtMessageScreen(
+                                    new TranslatableComponent("gui.delorean.load")));
+        }
+
         String levelName =
                 ((MinecraftServerAccessor) minecraftServer).getStorageSource().getLevelId();
 
@@ -166,13 +172,6 @@ public class SlotWrapper {
 
         for (ServerLevel serverLevel : minecraftServer.getAllLevels()) {
             serverLevel.noSave = true;
-        }
-
-        if (DeLorean.IS_CLIENT) {
-            Minecraft.getInstance()
-                    .setScreen(
-                            new GenericDirtMessageScreen(
-                                    new TranslatableComponent("gui.delorean.load")));
         }
 
         minecraftServer.getProfiler().push(DeLorean.MODID + "_haltServer");
@@ -224,8 +223,6 @@ public class SlotWrapper {
                             localPlayerData.getVelX(),
                             localPlayerData.getVelY(),
                             localPlayerData.getVelZ());
-
-                    mc.player.displayClientMessage(new TextComponent("sfdsfsdf"), false);
                 }
             }
 

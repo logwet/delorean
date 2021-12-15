@@ -1,8 +1,8 @@
 {
   "gui.delorean.save": "Saving savestate...",
-  "gui.delorean.load": "Loading savestate...",
-  "key.delorean.save": "Savestate",
-  "key.delorean.load": "Loadstate",
+  "gui.delorean.load": "Loading latest savestate...",
+  "key.delorean.save": "Save state",
+  "key.delorean.load": "Load latest state",
   "key.delorean.delete": "Delete all states",
   "key.category.delorean": "DeLorean Savestating"
 }
