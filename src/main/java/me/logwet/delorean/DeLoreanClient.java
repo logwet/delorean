@@ -44,14 +44,15 @@ public class DeLoreanClient implements ClientModInitializer {
                 client -> {
                     if (client.player != null
                             && client.level != null
+                            && client.hasSingleplayerServer()
                             && Objects.nonNull(DeLorean.SLOTMANAGER)) {
                         if (DeLorean.CONTROL_ENABLED) {
                             while (savestateKey.consumeClick()) {
                                 client.player.displayClientMessage(
                                         new TextComponent("Saving state..."), true);
 
-                                Thread thread =
-                                        new Thread(
+                                Objects.requireNonNull(client.getSingleplayerServer())
+                                        .execute(
                                                 () -> {
                                                     try {
                                                         DeLorean.SLOTMANAGER.save();
@@ -60,7 +61,6 @@ public class DeLoreanClient implements ClientModInitializer {
                                                                 "Failed to save state", e);
                                                     }
                                                 });
-                                thread.start();
                             }
 
                             while (loadstateKey.consumeClick()) {
@@ -74,8 +74,8 @@ public class DeLoreanClient implements ClientModInitializer {
                                 client.player.displayClientMessage(
                                         new TextComponent("Deleting all states..."), true);
 
-                                Thread thread =
-                                        new Thread(
+                                Objects.requireNonNull(client.getSingleplayerServer())
+                                        .execute(
                                                 () -> {
                                                     try {
                                                         DeLorean.SLOTMANAGER.deleteAll();
@@ -84,21 +84,30 @@ public class DeLoreanClient implements ClientModInitializer {
                                                                 "Failed to delete states", e);
                                                     }
                                                 });
-                                thread.start();
                             }
                         }
-                    }
 
-                    if (DeLorean.TRIGGER_LOAD.getAndSet(false)) {
-                        try {
-                            int slot;
-                            if ((slot = DeLorean.TRIGGER_LOAD_SLOT.getAndSet(-1)) != -1) {
-                                DeLorean.SLOTMANAGER.load(slot);
-                            } else {
-                                DeLorean.SLOTMANAGER.load();
+                        if (DeLorean.TRIGGER_LOAD.getAndSet(false)) {
+                            try {
+                                int slot;
+
+                                if ((slot = DeLorean.TRIGGER_LOAD_SLOT.getAndSet(-1)) != -1) {
+                                    DeLorean.SLOTMANAGER.load(slot);
+                                } else {
+                                    DeLorean.SLOTMANAGER.load();
+                                }
+                            } catch (Exception e) {
+                                DeLorean.LOGGER.error("Failed to load state", e);
                             }
-                        } catch (Exception e) {
-                            DeLorean.LOGGER.error("Failed to load state", e);
+                        } else if (Objects.nonNull(DeLorean.LOCAL_PLAYER_DATA)) {
+                            client.player.setDeltaMovement(
+                                    DeLorean.LOCAL_PLAYER_DATA.getVelX(),
+                                    DeLorean.LOCAL_PLAYER_DATA.getVelY(),
+                                    DeLorean.LOCAL_PLAYER_DATA.getVelZ());
+
+                            DeLorean.log(Level.INFO, "Set player velocity");
+
+                            DeLorean.LOCAL_PLAYER_DATA = null;
                         }
                     }
                 });

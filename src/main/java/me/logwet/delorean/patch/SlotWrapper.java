@@ -187,17 +187,16 @@ public class SlotWrapper {
         }
 
         try {
-            FileUtils.iterateFilesAndDirs(serverDir, FILE_FILTER, null)
-                    .forEachRemaining(File::delete);
-
-            FileUtils.copyDirectory(dir, serverDir, FILE_FILTER);
-
             slotData = slotDataFile.read();
-
             if (Objects.isNull(slotData)) {
                 DeLorean.log(Level.ERROR, "Unable to load data for slot " + id);
                 return false;
             }
+
+            FileUtils.iterateFilesAndDirs(serverDir, FILE_FILTER, null)
+                    .forEachRemaining(File::delete);
+
+            FileUtils.copyDirectory(dir, serverDir, FILE_FILTER);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -208,21 +207,10 @@ public class SlotWrapper {
 
             ((PatchedMinecraft) mc).loadSaveStateLevel(levelName);
 
-            if (mc.player != null) {
-                PlayerData localPlayerData = null;
-
-                for (PlayerData playerData : slotData.getPlayers()) {
-                    if (Objects.equals(playerData.getUUID(), mc.player.getStringUUID())) {
-                        localPlayerData = playerData;
-                        break;
-                    }
-                }
-
-                if (localPlayerData != null) {
-                    mc.player.setDeltaMovement(
-                            localPlayerData.getVelX(),
-                            localPlayerData.getVelY(),
-                            localPlayerData.getVelZ());
+            for (PlayerData playerData : slotData.getPlayers()) {
+                if (playerData.getUUID().equals(mc.getUser().getUuid())) {
+                    DeLorean.LOCAL_PLAYER_DATA = playerData;
+                    break;
                 }
             }
 

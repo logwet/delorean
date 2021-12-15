@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.logwet.delorean.patch.CommandManager;
 import me.logwet.delorean.patch.SlotManager;
+import me.logwet.delorean.patch.data.PlayerData;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
@@ -34,8 +35,11 @@ public class DeLorean implements ModInitializer {
     @NotNull public static SlotManager SLOTMANAGER;
 
     public static boolean CONTROL_ENABLED = true;
-    public static AtomicBoolean TRIGGER_LOAD = new AtomicBoolean(true);
+
+    public static AtomicBoolean TRIGGER_LOAD = new AtomicBoolean(false);
     public static AtomicInteger TRIGGER_LOAD_SLOT = new AtomicInteger(-1);
+
+    public static PlayerData LOCAL_PLAYER_DATA;
 
     public static void log(Level level, String message) {
         LOGGER.log(level, "[" + MODID + " v" + VERSION + "] " + message);

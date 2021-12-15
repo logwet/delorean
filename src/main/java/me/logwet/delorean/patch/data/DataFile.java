@@ -51,7 +51,7 @@ public class DataFile<T> {
             GSON.toJson(obj, clazz, writer);
             return true;
         } catch (IOException e) {
-            DeLorean.LOGGER.debug(e.getMessage());
+            DeLorean.LOGGER.error("Failed to write data file" + e);
         }
 
         return false;
