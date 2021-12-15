@@ -40,6 +40,7 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     // modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+    include(modImplementation("net.fabricmc.fabric-api:fabric-command-api-v1:${project.fabric_command_api_version}"))
     include(modImplementation("net.fabricmc.fabric-api:fabric-key-binding-api-v1:${project.fabric_key_binding_api_version}"))
     include(modImplementation("net.fabricmc.fabric-api:fabric-lifecycle-events-v1:${project.fabric_lifecycle_events_version}"))
 

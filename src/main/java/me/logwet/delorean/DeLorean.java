@@ -2,9 +2,12 @@ package me.logwet.delorean;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import me.logwet.delorean.patch.CommandManager;
 import me.logwet.delorean.patch.SlotManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
@@ -30,8 +33,9 @@ public class DeLorean implements ModInitializer {
 
     @NotNull public static SlotManager SLOTMANAGER;
 
-    public static boolean KEYBINDS_ACTIVE = true;
+    public static boolean CONTROL_ENABLED = true;
     public static AtomicBoolean TRIGGER_LOAD = new AtomicBoolean(true);
+    public static AtomicInteger TRIGGER_LOAD_SLOT = new AtomicInteger(-1);
 
     public static void log(Level level, String message) {
         LOGGER.log(level, "[" + MODID + " v" + VERSION + "] " + message);
@@ -48,6 +52,8 @@ public class DeLorean implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        CommandRegistrationCallback.EVENT.register(CommandManager::register);
+
         log(Level.INFO, "Main class initialized!");
     }
 }

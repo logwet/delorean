@@ -45,7 +45,7 @@ public class DeLoreanClient implements ClientModInitializer {
                     if (client.player != null
                             && client.level != null
                             && Objects.nonNull(DeLorean.SLOTMANAGER)) {
-                        if (DeLorean.KEYBINDS_ACTIVE) {
+                        if (DeLorean.CONTROL_ENABLED) {
                             while (savestateKey.consumeClick()) {
                                 client.player.displayClientMessage(
                                         new TextComponent("Saving latest state..."), true);
@@ -91,7 +91,12 @@ public class DeLoreanClient implements ClientModInitializer {
 
                     if (DeLorean.TRIGGER_LOAD.getAndSet(false)) {
                         try {
-                            DeLorean.SLOTMANAGER.load();
+                            int slot;
+                            if ((slot = DeLorean.TRIGGER_LOAD_SLOT.getAndSet(-1)) != -1) {
+                                DeLorean.SLOTMANAGER.load(slot);
+                            } else {
+                                DeLorean.SLOTMANAGER.load();
+                            }
                         } catch (Exception e) {
                             DeLorean.LOGGER.error("Failed to load state", e);
                         }
