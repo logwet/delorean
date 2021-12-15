@@ -1,4 +1,4 @@
-package me.logwet.delorean.util.data;
+package me.logwet.delorean.data;
 
 import java.util.List;
 import org.jetbrains.annotations.NotNull;

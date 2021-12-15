@@ -1,12 +1,12 @@
-package me.logwet.delorean.util.saveslots.wrapper;
+package me.logwet.delorean.saveslots.wrapper;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import me.logwet.delorean.DeLorean;
+import me.logwet.delorean.data.PlayerData;
 import me.logwet.delorean.mixin.common.MinecraftServerAccessor;
 import me.logwet.delorean.patch.PatchedMinecraft;
-import me.logwet.delorean.util.data.PlayerData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.player.LocalPlayer;

@@ -1,10 +1,10 @@
-package me.logwet.delorean.util.saveslots.wrapper;
+package me.logwet.delorean.saveslots.wrapper;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import me.logwet.delorean.util.data.PlayerData;
+import me.logwet.delorean.data.PlayerData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;

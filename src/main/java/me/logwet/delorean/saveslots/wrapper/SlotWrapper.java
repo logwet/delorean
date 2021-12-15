@@ -1,4 +1,4 @@
-package me.logwet.delorean.util.saveslots.wrapper;
+package me.logwet.delorean.saveslots.wrapper;
 
 import net.minecraft.server.MinecraftServer;
 

@@ -1,4 +1,4 @@
-package me.logwet.delorean.util.saveslots.wrapper;
+package me.logwet.delorean.saveslots.wrapper;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import me.logwet.delorean.DeLorean;
+import me.logwet.delorean.data.JSONDataFile;
+import me.logwet.delorean.data.PlayerData;
+import me.logwet.delorean.data.SlotData;
 import me.logwet.delorean.patch.PatchedMinecraftServer;
-import me.logwet.delorean.util.data.JSONDataFile;
-import me.logwet.delorean.util.data.PlayerData;
-import me.logwet.delorean.util.data.SlotData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
