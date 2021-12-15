@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import me.logwet.delorean.data.PlayerData;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 
+@Environment(EnvType.SERVER)
 public class DedicatedSlotWrapper extends AbstractSlotWrapper {
     public DedicatedSlotWrapper(File saveslotsDir, String id) {
         super(saveslotsDir, id);

@@ -7,6 +7,8 @@ import me.logwet.delorean.DeLorean;
 import me.logwet.delorean.data.PlayerData;
 import me.logwet.delorean.mixin.common.MinecraftServerAccessor;
 import me.logwet.delorean.patch.PatchedMinecraft;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.player.LocalPlayer;
@@ -15,6 +17,7 @@ import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.glfw.GLFW;
 
+@Environment(EnvType.CLIENT)
 public class IntegratedSlotWrapper extends AbstractSlotWrapper {
     public IntegratedSlotWrapper(File saveslotsDir, String id) {
         super(saveslotsDir, id);
