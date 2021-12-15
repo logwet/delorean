@@ -1,4 +1,4 @@
-package me.logwet.delorean.patch.data;
+package me.logwet.delorean.util.data;
 
 import java.util.TreeMap;
 import org.jetbrains.annotations.NotNull;

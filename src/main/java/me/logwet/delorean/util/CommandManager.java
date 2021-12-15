@@ -1,4 +1,4 @@
-package me.logwet.delorean.patch;
+package me.logwet.delorean.util;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;

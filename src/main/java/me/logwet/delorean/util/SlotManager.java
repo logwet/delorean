@@ -1,4 +1,4 @@
-package me.logwet.delorean.patch;
+package me.logwet.delorean.util;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import me.logwet.delorean.patch.data.JSONDataFile;
-import me.logwet.delorean.patch.data.PlayerData;
-import me.logwet.delorean.patch.data.SlotsData;
+import me.logwet.delorean.util.data.JSONDataFile;
+import me.logwet.delorean.util.data.PlayerData;
+import me.logwet.delorean.util.data.SlotsData;
 import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

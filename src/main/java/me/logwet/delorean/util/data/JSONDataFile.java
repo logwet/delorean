@@ -1,4 +1,4 @@
-package me.logwet.delorean.patch.data;
+package me.logwet.delorean.util.data;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

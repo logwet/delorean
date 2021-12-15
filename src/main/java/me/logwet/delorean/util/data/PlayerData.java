@@ -1,4 +1,4 @@
-package me.logwet.delorean.patch.data;
+package me.logwet.delorean.util.data;
 
 public class PlayerData {
     private final String uuid;

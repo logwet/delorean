@@ -2,7 +2,7 @@ package me.logwet.delorean.mixin.common;
 
 import java.util.Iterator;
 import me.logwet.delorean.DeLorean;
-import me.logwet.delorean.patch.PatchedMinecraftServer;
+import me.logwet.delorean.util.PatchedMinecraftServer;
 import net.minecraft.core.RegistryAccess.RegistryHolder;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.bossevents.CustomBossEvents;

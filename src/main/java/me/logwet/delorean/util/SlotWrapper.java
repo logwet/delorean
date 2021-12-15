@@ -1,4 +1,4 @@
-package me.logwet.delorean.patch;
+package me.logwet.delorean.util;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Objects;
 import me.logwet.delorean.DeLorean;
 import me.logwet.delorean.mixin.common.MinecraftServerAccessor;
-import me.logwet.delorean.patch.data.JSONDataFile;
-import me.logwet.delorean.patch.data.PlayerData;
-import me.logwet.delorean.patch.data.SlotData;
+import me.logwet.delorean.util.data.JSONDataFile;
+import me.logwet.delorean.util.data.PlayerData;
+import me.logwet.delorean.util.data.SlotData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.player.LocalPlayer;

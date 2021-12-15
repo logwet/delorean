@@ -1,4 +1,4 @@
-package me.logwet.delorean.patch;
+package me.logwet.delorean.util;
 
 public interface PatchedMinecraft {
     void loadSaveStateLevel(String string);
