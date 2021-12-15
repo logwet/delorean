@@ -1,4 +1,4 @@
-package me.logwet.delorean.util;
+package me.logwet.delorean.util.wrapper;
 
 import net.minecraft.server.MinecraftServer;
 

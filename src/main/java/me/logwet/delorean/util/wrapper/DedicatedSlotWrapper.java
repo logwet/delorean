@@ -1,4 +1,4 @@
-package me.logwet.delorean.util;
+package me.logwet.delorean.util.wrapper;
 
 import java.io.File;
 import java.util.ArrayList;

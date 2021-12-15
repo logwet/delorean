@@ -10,6 +10,8 @@ import java.util.UUID;
 import me.logwet.delorean.util.data.JSONDataFile;
 import me.logwet.delorean.util.data.PlayerData;
 import me.logwet.delorean.util.data.SlotsData;
+import me.logwet.delorean.util.wrapper.IntegratedSlotWrapper;
+import me.logwet.delorean.util.wrapper.SlotWrapper;
 import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
