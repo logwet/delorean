@@ -2,18 +2,20 @@ package me.logwet.delorean.mixin.client;
 
 import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
+import java.io.File;
 import me.logwet.delorean.DeLorean;
+import me.logwet.delorean.saveslots.manager.IntegratedSlotManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.RegistryAccess.RegistryHolder;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerResources;
 import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.players.GameProfileCache;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import net.minecraft.world.level.storage.WorldData;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,6 +40,13 @@ public abstract class IntegratedServerMixin {
             GameProfileCache gameProfileCache,
             ChunkProgressListenerFactory chunkProgressListenerFactory,
             CallbackInfo ci) {
-        DeLorean.initServer((MinecraftServer) (Object) this);
+        IntegratedServer minecraftServer = (IntegratedServer) (Object) this;
+
+        DeLorean.initSlotManager(
+                new IntegratedSlotManager(
+                        new File(
+                                minecraftServer.getWorldPath(LevelResource.ROOT).toFile(),
+                                DeLorean.SAVESTATES_DIR_NAME),
+                        minecraftServer));
     }
 }

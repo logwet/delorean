@@ -1,6 +1,5 @@
 package me.logwet.delorean;
 
-import java.io.File;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -11,8 +10,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.storage.LevelResource;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,14 +47,9 @@ public class DeLorean implements ModInitializer {
         LOGGER.log(level, "[" + MODID + " v" + VERSION + "] " + message);
     }
 
-    public static void initServer(MinecraftServer minecraftServer) {
+    public static void initSlotManager(SlotManager slotManager) {
         synchronized (SLOTMANAGER_LOCK) {
-            SLOTMANAGER =
-                    new SlotManager(
-                            new File(
-                                    minecraftServer.getWorldPath(LevelResource.ROOT).toFile(),
-                                    SAVESTATES_DIR_NAME),
-                            minecraftServer);
+            SLOTMANAGER = slotManager;
         }
     }
 

@@ -26,7 +26,7 @@ public class CommandManager {
         Map<Integer, String> slots;
 
         synchronized (DeLorean.SLOTMANAGER_LOCK) {
-            slots = DeLorean.SLOTMANAGER.slotsData.getSlots();
+            slots = DeLorean.SLOTMANAGER.getSlotsData().getSlots();
         }
 
         context.getSource().sendSuccess(new TextComponent("Slots: " + slots), true);

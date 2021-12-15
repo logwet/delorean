@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 
 public class DedicatedSlotWrapper extends AbstractSlotWrapper {
-    protected DedicatedSlotWrapper(File saveslotsDir, String id) {
+    public DedicatedSlotWrapper(File saveslotsDir, String id) {
         super(saveslotsDir, id);
     }
 

@@ -3,11 +3,12 @@ package me.logwet.delorean.mixin.server;
 import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.datafixers.DataFixer;
+import java.io.File;
 import me.logwet.delorean.DeLorean;
+import me.logwet.delorean.saveslots.manager.DedicatedSlotManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.RegistryAccess.RegistryHolder;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerResources;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.DedicatedServerSettings;
@@ -15,6 +16,7 @@ import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.players.GameProfileCache;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import net.minecraft.world.level.storage.WorldData;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,6 +42,13 @@ public abstract class DedicatedServerMixin {
             GameProfileCache gameProfileCache,
             ChunkProgressListenerFactory chunkProgressListenerFactory,
             CallbackInfo ci) {
-        DeLorean.initServer((MinecraftServer) (Object) this);
+        DedicatedServer minecraftServer = (DedicatedServer) (Object) this;
+
+        DeLorean.initSlotManager(
+                new DedicatedSlotManager(
+                        new File(
+                                minecraftServer.getWorldPath(LevelResource.ROOT).toFile(),
+                                DeLorean.SAVESTATES_DIR_NAME),
+                        minecraftServer));
     }
 }
