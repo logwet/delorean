@@ -35,10 +35,10 @@ public class DeLorean implements ModInitializer {
 
     public static AtomicBoolean TRIGGER_SAVE = new AtomicBoolean(false);
     public static AtomicInteger TRIGGER_SAVE_SLOT = new AtomicInteger(-1);
+    public static AtomicInteger TRIGGER_SAVE_IN_TICKS = new AtomicInteger(-1);
 
     public static AtomicBoolean TRIGGER_LOAD = new AtomicBoolean(false);
     public static AtomicInteger TRIGGER_LOAD_SLOT = new AtomicInteger(-1);
-    public static AtomicInteger TRIGGER_SAVE_IN_TICKS = new AtomicInteger(-1);
 
     public static AtomicBoolean TRIGGER_DELETE = new AtomicBoolean(false);
     public static AtomicInteger TRIGGER_DELETE_SLOT = new AtomicInteger(-1);
