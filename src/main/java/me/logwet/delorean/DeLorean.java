@@ -27,9 +27,10 @@ public class DeLorean implements ModInitializer {
     public static final boolean IS_CLIENT =
             FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     public static final Logger LOGGER = LogManager.getLogger(MODID);
-    public static final String SLOTMANAGER_LOCK = "slotmanager_lock";
+
+    protected static final String SLOTMANAGER_LOCK = "slotmanager_lock";
     public static String SAVESTATES_DIR_NAME = "savestates";
-    @Nullable public static SlotManager SLOTMANAGER;
+
     public static boolean CONTROL_ENABLED = true;
 
     public static AtomicBoolean TRIGGER_SAVE = new AtomicBoolean(false);
@@ -42,6 +43,7 @@ public class DeLorean implements ModInitializer {
     public static AtomicInteger TRIGGER_DELETE_SLOT = new AtomicInteger(-1);
 
     public static volatile PlayerData LOCAL_PLAYER_DATA;
+    @Nullable protected static SlotManager SLOTMANAGER;
 
     public static void log(Level level, String message) {
         LOGGER.log(level, "[" + MODID + " v" + VERSION + "] " + message);
