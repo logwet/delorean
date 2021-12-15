@@ -50,7 +50,7 @@ public class SlotManager {
     }
 
     private SlotWrapper getSlotWrapper(String id) {
-        return saveSlots.computeIfAbsent(id, s -> new SlotWrapper(saveslotsDir, s));
+        return saveSlots.computeIfAbsent(id, s -> new IntegratedSlotWrapper(saveslotsDir, s));
     }
 
     private void putSlotWrapper(String id, SlotWrapper slot) {
@@ -93,7 +93,7 @@ public class SlotManager {
         saveSlotsData();
 
         if (Objects.nonNull(minecraftServer)) {
-            putSlotWrapper(id, new SlotWrapper(saveslotsDir, id));
+            putSlotWrapper(id, new IntegratedSlotWrapper(saveslotsDir, id));
             return id;
         }
 
