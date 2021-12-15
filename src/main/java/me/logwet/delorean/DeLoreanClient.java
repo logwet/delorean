@@ -85,10 +85,15 @@ public class DeLoreanClient implements ClientModInitializer {
                                 }
                             }
                         } else if (Objects.nonNull(DeLorean.LOCAL_PLAYER_DATA)) {
+                            client.player.setPos(
+                                    DeLorean.LOCAL_PLAYER_DATA.getPosition().getX(),
+                                    DeLorean.LOCAL_PLAYER_DATA.getPosition().getY(),
+                                    DeLorean.LOCAL_PLAYER_DATA.getPosition().getZ());
+
                             client.player.setDeltaMovement(
-                                    DeLorean.LOCAL_PLAYER_DATA.getVelX(),
-                                    DeLorean.LOCAL_PLAYER_DATA.getVelY(),
-                                    DeLorean.LOCAL_PLAYER_DATA.getVelZ());
+                                    DeLorean.LOCAL_PLAYER_DATA.getPosition().getVelX(),
+                                    DeLorean.LOCAL_PLAYER_DATA.getPosition().getVelY(),
+                                    DeLorean.LOCAL_PLAYER_DATA.getPosition().getVelZ());
 
                             DeLorean.log(Level.INFO, "Set player velocity");
 

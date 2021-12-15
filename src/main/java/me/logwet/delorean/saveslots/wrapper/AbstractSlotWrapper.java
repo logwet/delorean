@@ -9,6 +9,7 @@ import java.util.Objects;
 import me.logwet.delorean.DeLorean;
 import me.logwet.delorean.data.JSONDataFile;
 import me.logwet.delorean.data.PlayerData;
+import me.logwet.delorean.data.PositionData;
 import me.logwet.delorean.data.SlotData;
 import me.logwet.delorean.patch.PatchedMinecraftServer;
 import net.minecraft.server.MinecraftServer;
@@ -104,7 +105,15 @@ public abstract class AbstractSlotWrapper implements SlotWrapper {
 
         playerDataList.add(
                 new PlayerData(
-                        player.getStringUUID(), vehicleUUID, velocity.x, velocity.y, velocity.z));
+                        player.getStringUUID(),
+                        vehicleUUID,
+                        new PositionData(
+                                player.getX(),
+                                player.getY(),
+                                player.getZ(),
+                                velocity.x,
+                                velocity.y,
+                                velocity.z)));
     }
 
     protected abstract List<PlayerData> collectPlayerData(MinecraftServer minecraftServer);
