@@ -1,6 +1,7 @@
 package me.logwet.delorean;
 
 import com.mojang.blaze3d.platform.InputConstants.Type;
+import java.util.Objects;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -41,50 +42,58 @@ public class DeLoreanClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(
                 client -> {
-                    if (client.player != null && client.level != null && DeLorean.KEYBINDS_ACTIVE) {
-                        while (savestateKey.consumeClick()) {
-                            client.player.displayClientMessage(
-                                    new TextComponent("Saving latest state..."), true);
+                    if (client.player != null
+                            && client.level != null
+                            && Objects.nonNull(DeLorean.SLOTMANAGER)) {
+                        if (DeLorean.KEYBINDS_ACTIVE) {
+                            while (savestateKey.consumeClick()) {
+                                client.player.displayClientMessage(
+                                        new TextComponent("Saving latest state..."), true);
 
-                            Thread thread =
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    DeLorean.SLOTMANAGER.save();
-                                                } catch (Exception e) {
-                                                    DeLorean.LOGGER.error(
-                                                            "Failed to save state", e);
-                                                }
-                                            });
-                            thread.start();
-                        }
+                                Thread thread =
+                                        new Thread(
+                                                () -> {
+                                                    try {
+                                                        DeLorean.SLOTMANAGER.save();
+                                                    } catch (Exception e) {
+                                                        DeLorean.LOGGER.error(
+                                                                "Failed to save state", e);
+                                                    }
+                                                });
+                                thread.start();
+                            }
 
-                        while (loadstateKey.consumeClick()) {
-                            client.player.displayClientMessage(
-                                    new TextComponent("Loading latest state..."), true);
+                            while (loadstateKey.consumeClick()) {
+                                client.player.displayClientMessage(
+                                        new TextComponent("Loading latest state..."), true);
 
-                            try {
-                                DeLorean.SLOTMANAGER.load();
-                            } catch (Exception e) {
-                                DeLorean.LOGGER.error("Failed to load state", e);
+                                DeLorean.TRIGGER_LOAD.set(true);
+                            }
+
+                            while (deleteKey.consumeClick()) {
+                                client.player.displayClientMessage(
+                                        new TextComponent("Deleting all states..."), true);
+
+                                Thread thread =
+                                        new Thread(
+                                                () -> {
+                                                    try {
+                                                        DeLorean.SLOTMANAGER.deleteAll();
+                                                    } catch (Exception e) {
+                                                        DeLorean.LOGGER.error(
+                                                                "Failed to delete states", e);
+                                                    }
+                                                });
+                                thread.start();
                             }
                         }
+                    }
 
-                        while (deleteKey.consumeClick()) {
-                            client.player.displayClientMessage(
-                                    new TextComponent("Deleting all states..."), true);
-
-                            Thread thread =
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    DeLorean.SLOTMANAGER.deleteAll();
-                                                } catch (Exception e) {
-                                                    DeLorean.LOGGER.error(
-                                                            "Failed to delete states", e);
-                                                }
-                                            });
-                            thread.start();
+                    if (DeLorean.TRIGGER_LOAD.getAndSet(false)) {
+                        try {
+                            DeLorean.SLOTMANAGER.load();
+                        } catch (Exception e) {
+                            DeLorean.LOGGER.error("Failed to load state", e);
                         }
                     }
                 });

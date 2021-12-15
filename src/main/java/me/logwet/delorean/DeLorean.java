@@ -1,6 +1,7 @@
 package me.logwet.delorean;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 import me.logwet.delorean.patch.SlotManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
@@ -30,6 +31,7 @@ public class DeLorean implements ModInitializer {
     @NotNull public static SlotManager SLOTMANAGER;
 
     public static boolean KEYBINDS_ACTIVE = true;
+    public static AtomicBoolean TRIGGER_LOAD = new AtomicBoolean(true);
 
     public static void log(Level level, String message) {
         LOGGER.log(level, "[" + MODID + " v" + VERSION + "] " + message);
