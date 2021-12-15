@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import me.logwet.delorean.patch.data.DataFile;
+import me.logwet.delorean.patch.data.JSONDataFile;
 import me.logwet.delorean.patch.data.PlayerData;
 import me.logwet.delorean.patch.data.SlotsData;
 import net.minecraft.server.MinecraftServer;
@@ -18,7 +18,7 @@ public class SlotManager {
     private final Map<String, SlotWrapper> saveSlots = new HashMap<>();
     private final File saveslotsDir;
     private final MinecraftServer minecraftServer;
-    private final DataFile<SlotsData> slotsDataFile;
+    private final JSONDataFile<SlotsData> slotsDataFile;
     @NotNull public SlotsData slotsData;
     protected List<PlayerData> playerDataList = new ArrayList<>();
 
@@ -27,7 +27,7 @@ public class SlotManager {
         this.saveslotsDir.mkdirs();
         this.minecraftServer = minecraftServer;
 
-        slotsDataFile = new DataFile<>(new File(saveslotsDir, "slots.json"), SlotsData.class);
+        slotsDataFile = new JSONDataFile<>(new File(saveslotsDir, "slots.json"), SlotsData.class);
 
         slotsData = slotsDataFile.read();
 

@@ -12,13 +12,13 @@ import java.util.Objects;
 import me.logwet.delorean.DeLorean;
 import org.jetbrains.annotations.Nullable;
 
-public class DataFile<T> {
+public class JSONDataFile<T> {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final File file;
     private final Class<T> clazz;
 
-    public DataFile(File file, Class<T> clazz) {
+    public JSONDataFile(File file, Class<T> clazz) {
         this.file = file;
         this.clazz = clazz;
     }

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import me.logwet.delorean.DeLorean;
 import me.logwet.delorean.mixin.common.MinecraftServerAccessor;
-import me.logwet.delorean.patch.data.DataFile;
+import me.logwet.delorean.patch.data.JSONDataFile;
 import me.logwet.delorean.patch.data.PlayerData;
 import me.logwet.delorean.patch.data.SlotData;
 import net.minecraft.client.Minecraft;
@@ -45,7 +45,7 @@ public class SlotWrapper {
 
     private final String id;
     private final File dir;
-    private final DataFile<SlotData> slotDataFile;
+    private final JSONDataFile<SlotData> slotDataFile;
     @Nullable private SlotData slotData;
 
     public SlotWrapper(File saveslotsDir, String id) {
@@ -54,7 +54,7 @@ public class SlotWrapper {
         dir = new File(saveslotsDir, id);
         dir.mkdirs();
 
-        slotDataFile = new DataFile<>(new File(dir, SLOT_FILE_NAME), SlotData.class);
+        slotDataFile = new JSONDataFile<>(new File(dir, SLOT_FILE_NAME), SlotData.class);
 
         slotData = slotDataFile.read();
 
