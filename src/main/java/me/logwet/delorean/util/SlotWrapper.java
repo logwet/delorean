@@ -139,8 +139,6 @@ public class SlotWrapper {
 
         unsafeCopyDirectory(serverDir, dir, FILE_FILTER);
 
-        System.gc();
-
         minecraftServer.getProfiler().pop();
         DeLorean.log(Level.INFO, "Saved slot " + id);
 
@@ -217,8 +215,6 @@ public class SlotWrapper {
             GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), mouseX, mouseY);
             mc.mouseHandler.turnPlayer();
         }
-
-        System.gc();
 
         DeLorean.log(Level.INFO, "Loaded slot " + id);
 
