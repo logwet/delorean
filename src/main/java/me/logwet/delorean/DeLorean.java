@@ -38,6 +38,7 @@ public class DeLorean implements ModInitializer {
 
     public static AtomicBoolean TRIGGER_LOAD = new AtomicBoolean(false);
     public static AtomicInteger TRIGGER_LOAD_SLOT = new AtomicInteger(-1);
+    public static AtomicInteger TRIGGER_SAVE_IN_TICKS = new AtomicInteger(-1);
 
     public static AtomicBoolean TRIGGER_DELETE = new AtomicBoolean(false);
     public static AtomicInteger TRIGGER_DELETE_SLOT = new AtomicInteger(-1);
@@ -62,7 +63,12 @@ public class DeLorean implements ModInitializer {
         ServerTickEvents.END_SERVER_TICK.register(
                 server -> {
                     if (Objects.nonNull(SLOTMANAGER)) {
-                        if (TRIGGER_SAVE.getAndSet(false)) {
+                        if (DeLorean.TRIGGER_SAVE_IN_TICKS.get() >= 0) {
+                            DeLorean.TRIGGER_SAVE_IN_TICKS.getAndDecrement();
+                        }
+
+                        if (DeLorean.TRIGGER_SAVE_IN_TICKS.get() < 0
+                                && TRIGGER_SAVE.getAndSet(false)) {
                             synchronized (SLOTMANAGER_LOCK) {
                                 try {
                                     int slot;
