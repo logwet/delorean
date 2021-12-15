@@ -6,6 +6,7 @@ import static net.minecraft.commands.Commands.literal;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import java.util.Map;
 import me.logwet.delorean.DeLorean;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.TextComponent;
@@ -23,21 +24,26 @@ public class CommandManager {
     }
 
     private static int list(CommandContext<CommandSourceStack> context) {
-        context.getSource()
-                .sendSuccess(
-                        new TextComponent("Slots: " + DeLorean.SLOTMANAGER.slotsData.getSlots()),
-                        true);
+        Map<Integer, String> slots;
+
+        synchronized (DeLorean.SLOTMANAGER_LOCK) {
+            slots = DeLorean.SLOTMANAGER.slotsData.getSlots();
+        }
+
+        context.getSource().sendSuccess(new TextComponent("Slots: " + slots), true);
 
         return 1;
     }
 
-    private static int saveID(CommandContext<CommandSourceStack> context) {
+    private static int saveSlot(CommandContext<CommandSourceStack> context) {
         if (DeLorean.CONTROL_ENABLED) {
-            int index = getIntArgument(context, "index");
-            index--;
+            int slot = getIntArgument(context, "slot");
+            slot--;
 
-            DeLorean.SLOTMANAGER.save(index);
-            context.getSource().sendSuccess(new TextComponent("Saved slot " + (index + 1)), true);
+            DeLorean.TRIGGER_SAVE.set(true);
+            DeLorean.TRIGGER_SAVE_SLOT.set(slot);
+
+            context.getSource().sendSuccess(new TextComponent("Saved slot " + (slot + 1)), true);
 
             return 1;
         } else {
@@ -45,15 +51,15 @@ public class CommandManager {
         }
     }
 
-    private static int loadID(CommandContext<CommandSourceStack> context) {
-        int index = getIntArgument(context, "index");
-        index--;
+    private static int loadSlot(CommandContext<CommandSourceStack> context) {
+        int slot = getIntArgument(context, "slot");
+        slot--;
 
         if (DeLorean.CONTROL_ENABLED) {
             DeLorean.TRIGGER_LOAD.set(true);
-            DeLorean.TRIGGER_LOAD_SLOT.set(index);
+            DeLorean.TRIGGER_LOAD_SLOT.set(slot);
 
-            context.getSource().sendSuccess(new TextComponent("Loaded slot " + (index + 1)), true);
+            context.getSource().sendSuccess(new TextComponent("Loaded slot " + (slot + 1)), true);
 
             return 1;
         } else {
@@ -63,7 +69,7 @@ public class CommandManager {
 
     private static int saveLatest(CommandContext<CommandSourceStack> context) {
         if (DeLorean.CONTROL_ENABLED) {
-            DeLorean.SLOTMANAGER.save();
+            DeLorean.TRIGGER_SAVE.set(true);
             context.getSource().sendSuccess(new TextComponent("Saved latest slot"), true);
 
             return 1;
@@ -84,6 +90,34 @@ public class CommandManager {
         }
     }
 
+    private static int deleteSlot(CommandContext<CommandSourceStack> context) {
+        int slot = getIntArgument(context, "slot");
+        slot--;
+
+        if (DeLorean.CONTROL_ENABLED) {
+            DeLorean.TRIGGER_DELETE.set(true);
+            DeLorean.TRIGGER_DELETE_SLOT.set(slot);
+
+            context.getSource().sendSuccess(new TextComponent("Deleted slot " + (slot + 1)), true);
+
+            return 1;
+        } else {
+            return disabled(context);
+        }
+    }
+
+    private static int deleteAll(CommandContext<CommandSourceStack> context) {
+        if (DeLorean.CONTROL_ENABLED) {
+            DeLorean.TRIGGER_DELETE.set(true);
+            context.getSource()
+                    .sendSuccess(new TextComponent("Triggered delete of all slots"), true);
+
+            return 1;
+        } else {
+            return disabled(context);
+        }
+    }
+
     public static void register(
             CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
         dispatcher.register(
@@ -93,13 +127,19 @@ public class CommandManager {
                                 literal("save")
                                         .executes(CommandManager::saveLatest)
                                         .then(
-                                                argument("index", IntegerArgumentType.integer(1, 9))
-                                                        .executes(CommandManager::saveID)))
+                                                argument("slot", IntegerArgumentType.integer(1, 9))
+                                                        .executes(CommandManager::saveSlot)))
                         .then(
                                 literal("load")
                                         .executes(CommandManager::loadLatest)
                                         .then(
-                                                argument("index", IntegerArgumentType.integer(1, 9))
-                                                        .executes(CommandManager::loadID))));
+                                                argument("slot", IntegerArgumentType.integer(1, 9))
+                                                        .executes(CommandManager::loadSlot)))
+                        .then(
+                                literal("delete")
+                                        .executes(CommandManager::deleteAll)
+                                        .then(
+                                                argument("slot", IntegerArgumentType.integer(1, 9))
+                                                        .executes(CommandManager::deleteSlot))));
     }
 }

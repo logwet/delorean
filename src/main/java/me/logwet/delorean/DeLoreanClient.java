@@ -42,8 +42,8 @@ public class DeLoreanClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(
                 client -> {
-                    if (client.player != null
-                            && client.level != null
+                    if (Objects.nonNull(client.player)
+                            && Objects.nonNull(client.level)
                             && client.hasSingleplayerServer()
                             && Objects.nonNull(DeLorean.SLOTMANAGER)) {
                         if (DeLorean.CONTROL_ENABLED) {
@@ -51,16 +51,7 @@ public class DeLoreanClient implements ClientModInitializer {
                                 client.player.displayClientMessage(
                                         new TextComponent("Saving state..."), true);
 
-                                Objects.requireNonNull(client.getSingleplayerServer())
-                                        .execute(
-                                                () -> {
-                                                    try {
-                                                        DeLorean.SLOTMANAGER.save();
-                                                    } catch (Exception e) {
-                                                        DeLorean.LOGGER.error(
-                                                                "Failed to save state", e);
-                                                    }
-                                                });
+                                DeLorean.TRIGGER_SAVE.set(true);
                             }
 
                             while (loadstateKey.consumeClick()) {
@@ -74,30 +65,24 @@ public class DeLoreanClient implements ClientModInitializer {
                                 client.player.displayClientMessage(
                                         new TextComponent("Deleting all states..."), true);
 
-                                Objects.requireNonNull(client.getSingleplayerServer())
-                                        .execute(
-                                                () -> {
-                                                    try {
-                                                        DeLorean.SLOTMANAGER.deleteAll();
-                                                    } catch (Exception e) {
-                                                        DeLorean.LOGGER.error(
-                                                                "Failed to delete states", e);
-                                                    }
-                                                });
+                                DeLorean.TRIGGER_DELETE.set(true);
                             }
                         }
 
                         if (DeLorean.TRIGGER_LOAD.getAndSet(false)) {
-                            try {
-                                int slot;
+                            synchronized (DeLorean.SLOTMANAGER_LOCK) {
+                                try {
+                                    int slot;
 
-                                if ((slot = DeLorean.TRIGGER_LOAD_SLOT.getAndSet(-1)) != -1) {
-                                    DeLorean.SLOTMANAGER.load(slot);
-                                } else {
-                                    DeLorean.SLOTMANAGER.load();
+                                    if ((slot = DeLorean.TRIGGER_LOAD_SLOT.getAndSet(-1)) != -1) {
+                                        DeLorean.SLOTMANAGER.load(slot);
+                                    } else {
+                                        DeLorean.SLOTMANAGER.load();
+                                    }
+
+                                } catch (Exception e) {
+                                    DeLorean.LOGGER.error("Failed to load state", e);
                                 }
-                            } catch (Exception e) {
-                                DeLorean.LOGGER.error("Failed to load state", e);
                             }
                         } else if (Objects.nonNull(DeLorean.LOCAL_PLAYER_DATA)) {
                             client.player.setDeltaMovement(
