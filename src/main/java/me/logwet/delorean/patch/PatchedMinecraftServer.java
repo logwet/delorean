@@ -1,4 +1,4 @@
-package me.logwet.delorean.util;
+package me.logwet.delorean.patch;
 
 import net.minecraft.util.ProgressListener;
 

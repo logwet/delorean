@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Objects;
 import me.logwet.delorean.DeLorean;
 import me.logwet.delorean.mixin.common.MinecraftServerAccessor;
+import me.logwet.delorean.patch.PatchedMinecraft;
+import me.logwet.delorean.patch.PatchedMinecraftServer;
 import me.logwet.delorean.util.data.JSONDataFile;
 import me.logwet.delorean.util.data.PlayerData;
 import me.logwet.delorean.util.data.SlotData;

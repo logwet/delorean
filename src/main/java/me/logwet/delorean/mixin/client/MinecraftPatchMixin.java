@@ -2,7 +2,7 @@ package me.logwet.delorean.mixin.client;
 
 import com.mojang.datafixers.util.Function4;
 import java.util.function.Function;
-import me.logwet.delorean.util.PatchedMinecraft;
+import me.logwet.delorean.patch.PatchedMinecraft;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
