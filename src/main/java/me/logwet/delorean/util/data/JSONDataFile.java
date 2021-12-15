@@ -13,7 +13,8 @@ import me.logwet.delorean.DeLorean;
 import org.jetbrains.annotations.Nullable;
 
 public class JSONDataFile<T> {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON =
+            new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
     private final File file;
     private final Class<T> clazz;

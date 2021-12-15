@@ -21,6 +21,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.io.FileUtils;
@@ -95,27 +97,33 @@ public class SlotWrapper {
         return slotDataFile.write(slotData);
     }
 
+    private void addPlayerDataToList(List<PlayerData> playerDataList, Player player) {
+        Vec3 velocity = player.getDeltaMovement();
+
+        String vehicleUUID = null;
+        Entity vehicle = player.getVehicle();
+        if (Objects.nonNull(vehicle)) {
+            vehicleUUID = vehicle.getStringUUID();
+        }
+
+        playerDataList.add(
+                new PlayerData(
+                        player.getStringUUID(), vehicleUUID, velocity.x, velocity.y, velocity.z));
+    }
+
     private List<PlayerData> collectPlayerData(MinecraftServer minecraftServer) {
         List<PlayerData> playerDataList = new ArrayList<>();
 
         if (DeLorean.IS_CLIENT) {
             LocalPlayer player = Minecraft.getInstance().player;
             assert player != null;
-            Vec3 velocity = player.getDeltaMovement();
-            playerDataList.add(
-                    new PlayerData(player.getStringUUID(), velocity.x, velocity.y, velocity.z));
+
+            addPlayerDataToList(playerDataList, player);
         } else {
             PlayerList playerList = minecraftServer.getPlayerList();
             if (Objects.nonNull(playerList)) {
-                for (ServerPlayer serverPlayer : playerList.getPlayers()) {
-                    Vec3 velocity = serverPlayer.getDeltaMovement();
-
-                    playerDataList.add(
-                            new PlayerData(
-                                    serverPlayer.getStringUUID(),
-                                    velocity.x,
-                                    velocity.y,
-                                    velocity.z));
+                for (ServerPlayer player : playerList.getPlayers()) {
+                    addPlayerDataToList(playerDataList, player);
                 }
             }
         }
@@ -179,7 +187,7 @@ public class SlotWrapper {
         minecraftServer.getProfiler().pop();
 
         if (DeLorean.IS_CLIENT) {
-            Minecraft.getInstance().level.disconnect();
+            // Minecraft.getInstance().level.disconnect();
             Minecraft.getInstance()
                     .clearLevel(
                             new GenericDirtMessageScreen(
