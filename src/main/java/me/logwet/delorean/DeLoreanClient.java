@@ -41,17 +41,22 @@ public class DeLoreanClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(
                 client -> {
-                    if (client.player != null && client.level != null) {
+                    if (client.player != null && client.level != null && DeLorean.KEYBINDS_ACTIVE) {
                         while (savestateKey.consumeClick()) {
                             client.player.displayClientMessage(
                                     new TextComponent("Saving latest state..."), true);
 
-                            try {
-                                Thread thread = new Thread(() -> DeLorean.SLOTMANAGER.save());
-                                thread.start();
-                            } catch (Exception e) {
-                                DeLorean.LOGGER.error("Failed to save state", e);
-                            }
+                            Thread thread =
+                                    new Thread(
+                                            () -> {
+                                                try {
+                                                    DeLorean.SLOTMANAGER.save();
+                                                } catch (Exception e) {
+                                                    DeLorean.LOGGER.error(
+                                                            "Failed to save state", e);
+                                                }
+                                            });
+                            thread.start();
                         }
 
                         while (loadstateKey.consumeClick()) {
@@ -69,12 +74,17 @@ public class DeLoreanClient implements ClientModInitializer {
                             client.player.displayClientMessage(
                                     new TextComponent("Deleting all states..."), true);
 
-                            try {
-                                Thread thread = new Thread(() -> DeLorean.SLOTMANAGER.deleteAll());
-                                thread.start();
-                            } catch (Exception e) {
-                                DeLorean.LOGGER.error("Failed to delete states", e);
-                            }
+                            Thread thread =
+                                    new Thread(
+                                            () -> {
+                                                try {
+                                                    DeLorean.SLOTMANAGER.deleteAll();
+                                                } catch (Exception e) {
+                                                    DeLorean.LOGGER.error(
+                                                            "Failed to delete states", e);
+                                                }
+                                            });
+                            thread.start();
                         }
                     }
                 });

@@ -29,6 +29,8 @@ public class DeLorean implements ModInitializer {
 
     @NotNull public static SlotManager SLOTMANAGER;
 
+    public static boolean KEYBINDS_ACTIVE = true;
+
     public static void log(Level level, String message) {
         LOGGER.log(level, "[" + MODID + " v" + VERSION + "] " + message);
     }
