@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.logwet.delorean.util.CommandManager;
 import me.logwet.delorean.util.data.PlayerData;
-import me.logwet.delorean.util.manager.SlotManager;
+import me.logwet.delorean.util.saveslots.manager.SlotManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
