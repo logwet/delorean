@@ -31,6 +31,7 @@ public class DeLorean implements ModInitializer {
     protected static final String SLOTMANAGER_LOCK = "slotmanager_lock";
     public static String SAVESTATES_DIR_NAME = "savestates";
 
+    public static boolean ENABLED = true;
     public static boolean CONTROL_ENABLED = true;
 
     public static AtomicBoolean TRIGGER_SAVE = new AtomicBoolean(false);
@@ -62,7 +63,7 @@ public class DeLorean implements ModInitializer {
 
         ServerTickEvents.END_SERVER_TICK.register(
                 server -> {
-                    if (Objects.nonNull(SLOTMANAGER)) {
+                    if (ENABLED && Objects.nonNull(SLOTMANAGER)) {
                         if (DeLorean.TRIGGER_SAVE_IN_TICKS.get() >= 0) {
                             DeLorean.TRIGGER_SAVE_IN_TICKS.getAndDecrement();
                         }

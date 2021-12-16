@@ -42,7 +42,8 @@ public class DeLoreanClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(
                 client -> {
-                    if (Objects.nonNull(client.player)
+                    if (DeLorean.ENABLED
+                            && Objects.nonNull(client.player)
                             && Objects.nonNull(client.level)
                             && client.hasSingleplayerServer()
                             && Objects.nonNull(DeLorean.SLOTMANAGER)) {
