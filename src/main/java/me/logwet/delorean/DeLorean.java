@@ -1,5 +1,6 @@
 package me.logwet.delorean;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,7 +29,7 @@ public class DeLorean implements ModInitializer {
             FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     public static final Logger LOGGER = LogManager.getLogger(MODID);
 
-    public static final String SLOTMANAGER_LOCK = "slotmanager_lock";
+    protected static final String SLOTMANAGER_LOCK = "slotmanager_lock";
     public static String SAVESTATES_DIR_NAME = "savestates";
 
     public static boolean ENABLED = true;
@@ -54,6 +55,12 @@ public class DeLorean implements ModInitializer {
     public static void initSlotManager(SlotManager slotManager) {
         synchronized (SLOTMANAGER_LOCK) {
             SLOTMANAGER = slotManager;
+        }
+    }
+
+    public static Map<Integer, String> getSlots() {
+        synchronized (SLOTMANAGER_LOCK) {
+            return SLOTMANAGER.getSlotsData().getSlots();
         }
     }
 
