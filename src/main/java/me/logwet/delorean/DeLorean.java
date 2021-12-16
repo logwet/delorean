@@ -28,7 +28,7 @@ public class DeLorean implements ModInitializer {
             FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     public static final Logger LOGGER = LogManager.getLogger(MODID);
 
-    protected static final String SLOTMANAGER_LOCK = "slotmanager_lock";
+    public static final String SLOTMANAGER_LOCK = "slotmanager_lock";
     public static String SAVESTATES_DIR_NAME = "savestates";
 
     public static boolean ENABLED = true;
