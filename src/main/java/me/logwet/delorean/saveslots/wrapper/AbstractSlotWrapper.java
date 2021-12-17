@@ -65,10 +65,9 @@ public abstract class AbstractSlotWrapper implements SlotWrapper {
 
         if (file.isFile()) {
             try {
-                //                Files.copy(file, dest);
                 FileUtils.copyFile(file, dest, false);
             } catch (IOException e) {
-                DeLorean.log(Level.INFO, "Unable to fully copy file " + file.getAbsolutePath());
+                DeLorean.log(Level.INFO, "Unable to fully copy file " + file);
             }
         } else if (file.isDirectory()) {
             dest.mkdirs();
@@ -153,9 +152,7 @@ public abstract class AbstractSlotWrapper implements SlotWrapper {
             serverLevel.noSave = true;
         }
 
-        minecraftServer.getProfiler().push(DeLorean.MODID + "_haltServer");
         minecraftServer.halt(true);
-        minecraftServer.getProfiler().pop();
 
         try {
             slotData = slotDataFile.read();
