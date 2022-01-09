@@ -81,12 +81,12 @@ public class DeLorean implements ModInitializer {
         ServerTickEvents.END_SERVER_TICK.register(
                 server -> {
                     if (ENABLED && Objects.nonNull(SLOTMANAGER)) {
-                        if (DeLorean.TRIGGER_SAVE_IN_TICKS.get() >= 0) {
-                            DeLorean.TRIGGER_SAVE_IN_TICKS.getAndDecrement();
+                        if (TRIGGER_SAVE_IN_TICKS.get() >= 0) {
+                            TRIGGER_SAVE_IN_TICKS.getAndDecrement();
                         }
 
-                        if (DeLorean.TRIGGER_SAVE_IN_TICKS.get() < 0
-                                && DeLorean.TRIGGER_SAVE.get()) {
+                        if (TRIGGER_SAVE_IN_TICKS.get() < 0
+                                && TRIGGER_SAVE.get()) {
                             synchronized (SLOTMANAGER_LOCK) {
                                 try {
                                     int slot;
@@ -101,15 +101,15 @@ public class DeLorean implements ModInitializer {
                                         SLOTMANAGER.save();
                                     }
                                 } catch (Exception e) {
-                                    DeLorean.LOGGER.error("Failed to save state", e);
+                                    LOGGER.error("Failed to save state", e);
                                 }
 
-                                DeLorean.TRIGGER_SAVE.set(false);
-                                DeLorean.TRIGGER_SAVE.notifyAll();
+                                TRIGGER_SAVE.set(false);
+                                TRIGGER_SAVE.notifyAll();
                             }
                         }
 
-                        if (DeLorean.TRIGGER_DELETE.get()) {
+                        if (TRIGGER_DELETE.get()) {
                             synchronized (SLOTMANAGER_LOCK) {
                                 try {
                                     int slot;
@@ -124,11 +124,11 @@ public class DeLorean implements ModInitializer {
                                         SLOTMANAGER.deleteAll();
                                     }
                                 } catch (Exception e) {
-                                    DeLorean.LOGGER.error("Failed to delete state", e);
+                                    LOGGER.error("Failed to delete state", e);
                                 }
 
-                                DeLorean.TRIGGER_DELETE.set(false);
-                                DeLorean.TRIGGER_DELETE.notifyAll();
+                                TRIGGER_DELETE.set(false);
+                                TRIGGER_DELETE.notifyAll();
                             }
                         }
                     }
