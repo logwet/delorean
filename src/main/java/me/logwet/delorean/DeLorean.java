@@ -61,7 +61,7 @@ public class DeLorean implements ModInitializer {
         }
     }
 
-    public static Map<Integer, String> getSlots() {
+    public static Map<Integer, String> getSlotMap() {
         try {
             synchronized (SLOTMANAGER_LOCK) {
                 assert SLOTMANAGER != null;
@@ -85,50 +85,53 @@ public class DeLorean implements ModInitializer {
                             TRIGGER_SAVE_IN_TICKS.getAndDecrement();
                         }
 
-                        if (TRIGGER_SAVE_IN_TICKS.get() < 0
-                                && TRIGGER_SAVE.get()) {
-                            synchronized (SLOTMANAGER_LOCK) {
-                                try {
-                                    int slot;
-                                    String id;
+                        if (TRIGGER_SAVE_IN_TICKS.get() < 0 && TRIGGER_SAVE.get()) {
+                            synchronized (TRIGGER_SAVE) {
+                                synchronized (SLOTMANAGER_LOCK) {
+                                    try {
+                                        int slot;
+                                        String id;
 
-                                    if ((slot = TRIGGER_SAVE_SLOT.getAndSet(-1)) != -1) {
-                                        SLOTMANAGER.save(slot);
-                                    } else if (!Objects.equals(
-                                            id = TRIGGER_SAVE_ID.getAndSet(""), "")) {
-                                        SLOTMANAGER.save(id);
-                                    } else {
-                                        SLOTMANAGER.save();
+                                        if ((slot = TRIGGER_SAVE_SLOT.getAndSet(-1)) != -1) {
+                                            SLOTMANAGER.save(slot);
+                                        } else if (!Objects.equals(
+                                                id = TRIGGER_SAVE_ID.getAndSet(""), "")) {
+                                            SLOTMANAGER.save(id);
+                                        } else {
+                                            SLOTMANAGER.save();
+                                        }
+                                    } catch (Exception e) {
+                                        LOGGER.error("Failed to save state", e);
                                     }
-                                } catch (Exception e) {
-                                    LOGGER.error("Failed to save state", e);
-                                }
 
-                                TRIGGER_SAVE.set(false);
-                                TRIGGER_SAVE.notifyAll();
+                                    TRIGGER_SAVE.set(false);
+                                    TRIGGER_SAVE.notifyAll();
+                                }
                             }
                         }
 
                         if (TRIGGER_DELETE.get()) {
-                            synchronized (SLOTMANAGER_LOCK) {
-                                try {
-                                    int slot;
-                                    String id;
+                            synchronized (TRIGGER_DELETE) {
+                                synchronized (SLOTMANAGER_LOCK) {
+                                    try {
+                                        int slot;
+                                        String id;
 
-                                    if ((slot = TRIGGER_DELETE_SLOT.getAndSet(-1)) != -1) {
-                                        SLOTMANAGER.delete(slot);
-                                    } else if (!Objects.equals(
-                                            id = TRIGGER_DELETE_ID.getAndSet(""), "")) {
-                                        SLOTMANAGER.delete(id);
-                                    } else {
-                                        SLOTMANAGER.deleteAll();
+                                        if ((slot = TRIGGER_DELETE_SLOT.getAndSet(-1)) != -1) {
+                                            SLOTMANAGER.delete(slot);
+                                        } else if (!Objects.equals(
+                                                id = TRIGGER_DELETE_ID.getAndSet(""), "")) {
+                                            SLOTMANAGER.delete(id);
+                                        } else {
+                                            SLOTMANAGER.deleteAll();
+                                        }
+                                    } catch (Exception e) {
+                                        LOGGER.error("Failed to delete state", e);
                                     }
-                                } catch (Exception e) {
-                                    LOGGER.error("Failed to delete state", e);
-                                }
 
-                                TRIGGER_DELETE.set(false);
-                                TRIGGER_DELETE.notifyAll();
+                                    TRIGGER_DELETE.set(false);
+                                    TRIGGER_DELETE.notifyAll();
+                                }
                             }
                         }
                     }

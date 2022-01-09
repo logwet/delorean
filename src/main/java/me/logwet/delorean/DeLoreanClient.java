@@ -71,26 +71,29 @@ public class DeLoreanClient implements ClientModInitializer {
                         }
 
                         if (DeLorean.TRIGGER_LOAD.get()) {
-                            synchronized (DeLorean.SLOTMANAGER_LOCK) {
-                                try {
-                                    int slot;
-                                    String id;
+                            synchronized (DeLorean.TRIGGER_LOAD) {
+                                synchronized (DeLorean.SLOTMANAGER_LOCK) {
+                                    try {
+                                        int slot;
+                                        String id;
 
-                                    if ((slot = DeLorean.TRIGGER_LOAD_SLOT.getAndSet(-1)) != -1) {
-                                        DeLorean.SLOTMANAGER.load(slot);
-                                    } else if (!Objects.equals(
-                                            id = DeLorean.TRIGGER_LOAD_ID.getAndSet(""), "")) {
-                                        DeLorean.SLOTMANAGER.load(id);
-                                    } else {
-                                        DeLorean.SLOTMANAGER.load();
+                                        if ((slot = DeLorean.TRIGGER_LOAD_SLOT.getAndSet(-1))
+                                                != -1) {
+                                            DeLorean.SLOTMANAGER.load(slot);
+                                        } else if (!Objects.equals(
+                                                id = DeLorean.TRIGGER_LOAD_ID.getAndSet(""), "")) {
+                                            DeLorean.SLOTMANAGER.load(id);
+                                        } else {
+                                            DeLorean.SLOTMANAGER.load();
+                                        }
+
+                                    } catch (Exception e) {
+                                        DeLorean.LOGGER.error("Failed to load state", e);
                                     }
 
-                                } catch (Exception e) {
-                                    DeLorean.LOGGER.error("Failed to load state", e);
+                                    DeLorean.TRIGGER_LOAD.set(false);
+                                    DeLorean.TRIGGER_LOAD.notifyAll();
                                 }
-
-                                DeLorean.TRIGGER_LOAD.set(false);
-                                DeLorean.TRIGGER_LOAD.notifyAll();
                             }
                         } else if (Objects.nonNull(DeLorean.LOCAL_PLAYER_DATA)) {
                             client.player.setPos(

@@ -25,9 +25,7 @@ public class CommandManager {
     private static int list(CommandContext<CommandSourceStack> context) {
         Map<Integer, String> slots;
 
-        synchronized (DeLorean.SLOTMANAGER_LOCK) {
-            slots = DeLorean.SLOTMANAGER.getSlotsData().getSlots();
-        }
+        slots = DeLorean.getSlotMap();
 
         context.getSource().sendSuccess(new TextComponent("Slots: " + slots), true);
 
