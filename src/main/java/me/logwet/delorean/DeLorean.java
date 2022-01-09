@@ -103,10 +103,10 @@ public class DeLorean implements ModInitializer {
                                     } catch (Exception e) {
                                         LOGGER.error("Failed to save state", e);
                                     }
-
-                                    TRIGGER_SAVE.set(false);
-                                    TRIGGER_SAVE.notifyAll();
                                 }
+
+                                TRIGGER_SAVE.set(false);
+                                TRIGGER_SAVE.notifyAll();
                             }
                         }
 
@@ -128,10 +128,10 @@ public class DeLorean implements ModInitializer {
                                     } catch (Exception e) {
                                         LOGGER.error("Failed to delete state", e);
                                     }
-
-                                    TRIGGER_DELETE.set(false);
-                                    TRIGGER_DELETE.notifyAll();
                                 }
+
+                                TRIGGER_DELETE.set(false);
+                                TRIGGER_DELETE.notifyAll();
                             }
                         }
                     }

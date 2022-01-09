@@ -90,10 +90,10 @@ public class DeLoreanClient implements ClientModInitializer {
                                     } catch (Exception e) {
                                         DeLorean.LOGGER.error("Failed to load state", e);
                                     }
-
-                                    DeLorean.TRIGGER_LOAD.set(false);
-                                    DeLorean.TRIGGER_LOAD.notifyAll();
                                 }
+
+                                DeLorean.TRIGGER_LOAD.set(false);
+                                DeLorean.TRIGGER_LOAD.notifyAll();
                             }
                         } else if (Objects.nonNull(DeLorean.LOCAL_PLAYER_DATA)) {
                             client.player.setPos(
