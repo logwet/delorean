@@ -29,21 +29,19 @@ public class DeLorean implements ModInitializer {
             FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     public static final Logger LOGGER = LogManager.getLogger(MODID);
 
+    public static final AtomicBoolean TRIGGER_SAVE = new AtomicBoolean(false);
+    public static final AtomicInteger TRIGGER_SAVE_SLOT = new AtomicInteger(-1);
+    public static final AtomicInteger TRIGGER_SAVE_IN_TICKS = new AtomicInteger(-1);
+    public static final AtomicBoolean TRIGGER_LOAD = new AtomicBoolean(false);
+    public static final AtomicInteger TRIGGER_LOAD_SLOT = new AtomicInteger(-1);
+    public static final AtomicBoolean TRIGGER_DELETE = new AtomicBoolean(false);
+    public static final AtomicInteger TRIGGER_DELETE_SLOT = new AtomicInteger(-1);
+
     protected static final String SLOTMANAGER_LOCK = "slotmanager_lock";
     public static String SAVESTATES_DIR_NAME = "savestates";
 
     public static boolean ENABLED = true;
     public static boolean CONTROL_ENABLED = true;
-
-    public static AtomicBoolean TRIGGER_SAVE = new AtomicBoolean(false);
-    public static AtomicInteger TRIGGER_SAVE_SLOT = new AtomicInteger(-1);
-    public static AtomicInteger TRIGGER_SAVE_IN_TICKS = new AtomicInteger(-1);
-
-    public static AtomicBoolean TRIGGER_LOAD = new AtomicBoolean(false);
-    public static AtomicInteger TRIGGER_LOAD_SLOT = new AtomicInteger(-1);
-
-    public static AtomicBoolean TRIGGER_DELETE = new AtomicBoolean(false);
-    public static AtomicInteger TRIGGER_DELETE_SLOT = new AtomicInteger(-1);
 
     public static volatile PlayerData LOCAL_PLAYER_DATA;
     @Nullable protected static SlotManager SLOTMANAGER;
@@ -76,7 +74,7 @@ public class DeLorean implements ModInitializer {
                         }
 
                         if (DeLorean.TRIGGER_SAVE_IN_TICKS.get() < 0
-                                && TRIGGER_SAVE.getAndSet(false)) {
+                                && DeLorean.TRIGGER_SAVE.get()) {
                             synchronized (SLOTMANAGER_LOCK) {
                                 try {
                                     int slot;
@@ -89,10 +87,13 @@ public class DeLorean implements ModInitializer {
                                 } catch (Exception e) {
                                     DeLorean.LOGGER.error("Failed to save state", e);
                                 }
+
+                                DeLorean.TRIGGER_SAVE.set(false);
+                                DeLorean.TRIGGER_SAVE.notifyAll();
                             }
                         }
 
-                        if (TRIGGER_DELETE.getAndSet(false)) {
+                        if (DeLorean.TRIGGER_DELETE.get()) {
                             synchronized (SLOTMANAGER_LOCK) {
                                 try {
                                     int slot;
@@ -105,6 +106,9 @@ public class DeLorean implements ModInitializer {
                                 } catch (Exception e) {
                                     DeLorean.LOGGER.error("Failed to delete state", e);
                                 }
+
+                                DeLorean.TRIGGER_DELETE.set(false);
+                                DeLorean.TRIGGER_DELETE.notifyAll();
                             }
                         }
                     }

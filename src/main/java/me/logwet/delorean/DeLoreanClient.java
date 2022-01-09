@@ -70,7 +70,7 @@ public class DeLoreanClient implements ClientModInitializer {
                             }
                         }
 
-                        if (DeLorean.TRIGGER_LOAD.getAndSet(false)) {
+                        if (DeLorean.TRIGGER_LOAD.get()) {
                             synchronized (DeLorean.SLOTMANAGER_LOCK) {
                                 try {
                                     int slot;
@@ -84,6 +84,9 @@ public class DeLoreanClient implements ClientModInitializer {
                                 } catch (Exception e) {
                                     DeLorean.LOGGER.error("Failed to load state", e);
                                 }
+
+                                DeLorean.TRIGGER_LOAD.set(false);
+                                DeLorean.TRIGGER_LOAD.notifyAll();
                             }
                         } else if (Objects.nonNull(DeLorean.LOCAL_PLAYER_DATA)) {
                             client.player.setPos(
