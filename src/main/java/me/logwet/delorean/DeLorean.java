@@ -1,9 +1,11 @@
 package me.logwet.delorean;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import me.logwet.delorean.data.PlayerData;
 import me.logwet.delorean.saveslots.manager.SlotManager;
 import net.fabricmc.api.EnvType;
@@ -31,11 +33,14 @@ public class DeLorean implements ModInitializer {
 
     public static final AtomicBoolean TRIGGER_SAVE = new AtomicBoolean(false);
     public static final AtomicInteger TRIGGER_SAVE_SLOT = new AtomicInteger(-1);
+    public static final AtomicReference<String> TRIGGER_SAVE_ID = new AtomicReference<>("");
     public static final AtomicInteger TRIGGER_SAVE_IN_TICKS = new AtomicInteger(-1);
     public static final AtomicBoolean TRIGGER_LOAD = new AtomicBoolean(false);
     public static final AtomicInteger TRIGGER_LOAD_SLOT = new AtomicInteger(-1);
+    public static final AtomicReference<String> TRIGGER_LOAD_ID = new AtomicReference<>("");
     public static final AtomicBoolean TRIGGER_DELETE = new AtomicBoolean(false);
     public static final AtomicInteger TRIGGER_DELETE_SLOT = new AtomicInteger(-1);
+    public static final AtomicReference<String> TRIGGER_DELETE_ID = new AtomicReference<>("");
 
     protected static final String SLOTMANAGER_LOCK = "slotmanager_lock";
     public static String SAVESTATES_DIR_NAME = "savestates";
@@ -57,9 +62,16 @@ public class DeLorean implements ModInitializer {
     }
 
     public static Map<Integer, String> getSlots() {
-        synchronized (SLOTMANAGER_LOCK) {
-            return SLOTMANAGER.getSlotsData().getSlots();
+        try {
+            synchronized (SLOTMANAGER_LOCK) {
+                assert SLOTMANAGER != null;
+                return SLOTMANAGER.getSlotsData().getSlots();
+            }
+        } catch (Exception e) {
+            LOGGER.error("Unable to get slot map", e);
         }
+
+        return Collections.emptyMap();
     }
 
     @Override
@@ -78,9 +90,13 @@ public class DeLorean implements ModInitializer {
                             synchronized (SLOTMANAGER_LOCK) {
                                 try {
                                     int slot;
+                                    String id;
 
                                     if ((slot = TRIGGER_SAVE_SLOT.getAndSet(-1)) != -1) {
                                         SLOTMANAGER.save(slot);
+                                    } else if (!Objects.equals(
+                                            id = TRIGGER_SAVE_ID.getAndSet(""), "")) {
+                                        SLOTMANAGER.save(id);
                                     } else {
                                         SLOTMANAGER.save();
                                     }
@@ -97,9 +113,13 @@ public class DeLorean implements ModInitializer {
                             synchronized (SLOTMANAGER_LOCK) {
                                 try {
                                     int slot;
+                                    String id;
 
                                     if ((slot = TRIGGER_DELETE_SLOT.getAndSet(-1)) != -1) {
                                         SLOTMANAGER.delete(slot);
+                                    } else if (!Objects.equals(
+                                            id = TRIGGER_DELETE_ID.getAndSet(""), "")) {
+                                        SLOTMANAGER.delete(id);
                                     } else {
                                         SLOTMANAGER.deleteAll();
                                     }

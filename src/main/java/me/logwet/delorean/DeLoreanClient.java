@@ -74,9 +74,13 @@ public class DeLoreanClient implements ClientModInitializer {
                             synchronized (DeLorean.SLOTMANAGER_LOCK) {
                                 try {
                                     int slot;
+                                    String id;
 
                                     if ((slot = DeLorean.TRIGGER_LOAD_SLOT.getAndSet(-1)) != -1) {
                                         DeLorean.SLOTMANAGER.load(slot);
+                                    } else if (!Objects.equals(
+                                            id = DeLorean.TRIGGER_LOAD_ID.getAndSet(""), "")) {
+                                        DeLorean.SLOTMANAGER.load(id);
                                     } else {
                                         DeLorean.SLOTMANAGER.load();
                                     }
